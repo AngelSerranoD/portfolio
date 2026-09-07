@@ -14,18 +14,18 @@ espacio y reglas horizontales.
 
 ## Proyectos publicados
 
-| Proyecto | Plataforma | Demo |
-|---|---|---|
-| **Nervio Vago** | Android · Flutter | Réplica web de la app |
-| **Sangría** | Web · PWA | Aplicación real |
-| **WeightTracker** | Android nativo | Réplica web de la app |
-| **SaludDiaria** | Android nativo | Réplica web de la app |
+El catálogo vive en `src/data/projects/`: un archivo por proyecto. Esta lista
+no se mantiene aquí a mano precisamente para que no se quede obsoleta.
 
-Las apps Android nativas no pueden ejecutarse en un navegador, así que su demo
-es una réplica en React de la interfaz original, construida a partir del código
-Kotlin real (mismos textos, misma paleta, mismas pantallas). Sangría es la
-aplicación auténtica: el código de `src/demos/sangria/` es el mismo que el de
-la app publicada.
+Cada ficha lleva descripción, características, tecnologías y unas **notas
+técnicas** que explican las decisiones de arquitectura del proyecto y por qué
+se tomaron.
+
+Sobre las demos: **Sangría es la aplicación auténtica** —el código de
+`src/demos/sangria/` es el mismo que el de la app publicada—. Las demás son
+réplicas en React construidas a partir del código real de cada app (mismos
+textos, misma paleta, mismas pantallas), porque una app Android o Flutter no
+puede ejecutarse dentro de un navegador.
 
 ---
 
