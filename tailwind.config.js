@@ -5,7 +5,13 @@ export default {
   theme: {
     extend: {
       colors: {
-        /* Escala monocroma. Sin color: solo densidad. */
+        /*
+         * Escala monocroma. Sin color: solo densidad.
+         * Los tonos 300-500 se usan para texto sobre el fondo 950, así que
+         * están fijados por contraste WCAG AA (>= 4.5:1), no por estética:
+         * 300 → 8.8:1 · 400 → 6.1:1 · 500 → 4.6:1
+         * Del 600 hacia abajo son superficies y bordes, nunca texto.
+         */
         mono: {
           950: '#000000',
           900: '#070707',
@@ -13,11 +19,11 @@ export default {
           800: '#141414',
           700: '#1F1F1F',
           600: '#2E2E2E',
-          500: '#4A4A4A',
-          400: '#6E6E6E',
-          300: '#949494',
-          200: '#BFBFBF',
-          100: '#E4E4E4',
+          500: '#757575',
+          400: '#8A8A8A',
+          300: '#A8A8A8',
+          200: '#CFCFCF',
+          100: '#E9E9E9',
           50: '#FFFFFF',
         },
       },

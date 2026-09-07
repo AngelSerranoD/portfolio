@@ -2,9 +2,9 @@
  * Marco de dispositivo que contiene las demos.
  * Copyright (c) 2026 Ángel Serrano Domínguez. Todos los derechos reservados.
  */
-export default function PhoneFrame({ children, className = '' }) {
+export default function PhoneFrame({ children }) {
   return (
-    <div className={`relative ${className}`}>
+    <div className="relative">
       {/* Carcasa */}
       <div className="relative rounded-[44px] bg-mono-800 p-[10px] shadow-[0_40px_90px_-25px_rgba(0,0,0,0.9)] ring-1 ring-mono-700">
         {/* Botones laterales */}

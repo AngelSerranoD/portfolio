@@ -143,7 +143,7 @@ export default function WeightTrackerDemo() {
 
   const actual = parseFloat(peso);
   const inicial = HISTORY[0][1];
-  const diff = (actual - inicial).toFixed(1);
+  const diff = actual - inicial;
 
   const guardar = () => {
     const v = parseFloat(entrada.replace(',', '.'));
@@ -186,7 +186,7 @@ export default function WeightTrackerDemo() {
                 </span>
               </div>
               <p className="mt-2 text-[12px] font-semibold" style={{ color: C.textDark }}>
-                {diff <= 0 ? '▼' : '▲'} {Math.abs(diff)} kg desde el {HISTORY[0][0]}
+                {diff <= 0 ? '▼' : '▲'} {Math.abs(diff).toFixed(1)} kg desde el {HISTORY[0][0]}
               </p>
             </Card>
 
@@ -261,7 +261,7 @@ export default function WeightTrackerDemo() {
                 Variación total
               </p>
               <p className="mt-1 text-[34px] font-extrabold leading-none" style={{ color: C.textDark }}>
-                {diff} kg
+                {diff.toFixed(1)} kg
               </p>
             </Card>
 

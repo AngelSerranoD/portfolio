@@ -2,7 +2,7 @@
  * Página de demo: ejecuta la aplicación dentro de un marco de móvil.
  * Copyright (c) 2026 Ángel Serrano Domínguez. Todos los derechos reservados.
  */
-import { Suspense, useEffect } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import PhoneFrame from '../components/PhoneFrame';
 import NotFound from './NotFound';
@@ -12,6 +12,8 @@ import { AUTHOR } from '../data/profile';
 
 export default function DemoPage() {
   const { slug } = useParams();
+  /* Cambiar esta clave remonta la demo desde cero, sin recargar el portfolio. */
+  const [runId, setRunId] = useState(0);
   const project = getProject(slug);
   const Demo = getDemo(slug);
 
@@ -37,10 +39,7 @@ export default function DemoPage() {
             <span className="label">Demo</span>
           </div>
 
-          <button
-            onClick={() => window.location.reload()}
-            className="link-quiet text-sm"
-          >
+          <button onClick={() => setRunId((n) => n + 1)} className="link-quiet text-sm">
             Reiniciar
           </button>
         </div>
@@ -55,7 +54,7 @@ export default function DemoPage() {
               </div>
             }
           >
-            <Demo />
+            <Demo key={runId} />
           </Suspense>
         </PhoneFrame>
 

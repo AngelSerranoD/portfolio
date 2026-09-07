@@ -65,26 +65,41 @@ para que `/proyecto/:slug` y `/demo/:slug` funcionen al recargar la página.
 ```
 src/
 ├── data/
-│   ├── projects.js      ← catálogo de proyectos (aquí se añaden los nuevos)
-│   └── profile.js       ← datos personales y usuario de GitHub
-├── components/          ← Nav, Footer, ProjectCard, PhoneFrame
-├── pages/               ← Home, ProjectDetail, DemoPage
+│   ├── profile.js       ← datos personales y usuario de GitHub
+│   ├── projects.js      ← agregador: no se toca
+│   └── projects/        ← UN ARCHIVO POR PROYECTO
+│       ├── nervio-vago.js
+│       ├── sangria.js
+│       ├── weighttracker.js
+│       └── salud-diaria.js
+├── components/          ← Nav, Footer, ProjectRow, TechnicalNote, PhoneFrame
+├── pages/               ← Home, ProjectDetail, DemoPage, NotFound
 └── demos/
-    ├── index.js         ← registro de demos (slug → componente)
-    ├── NervioVagoDemo.jsx
-    ├── WeightTrackerDemo.jsx
-    ├── SaludDiariaDemo.jsx
-    └── sangria/         ← copia de la app real
+    ├── index.js         ← registro automático: no se toca
+    ├── nervio-vago.jsx  ← el nombre del archivo ES el slug
+    ├── weighttracker.jsx
+    ├── salud-diaria.jsx
+    └── sangria/index.jsx  ← si la demo necesita archivos propios
 ```
+
+Tanto los proyectos como las demos se descubren solos con `import.meta.glob`
+de Vite. No hay ninguna lista que mantener sincronizada a mano.
 
 ### Añadir un proyecto nuevo
 
-1. Añadir su entrada a `src/data/projects.js`, incluido el array `technical`
-   con las notas de arquitectura.
-2. Crear la demo en `src/demos/` y registrarla en `src/demos/index.js` con el
-   mismo `slug`.
-3. `npm run build` para comprobar que compila.
-4. Commit y push: Vercel redespliega automáticamente.
+1. **Crear `src/data/projects/<slug>.js`** exportando por defecto el objeto del
+   proyecto. El campo `order` decide su posición en la portada.
+2. **Opcional: crear la demo** en `src/demos/<slug>.jsx` (o
+   `src/demos/<slug>/index.jsx` si necesita varios archivos). Si no existe, la
+   ficha simplemente no muestra el botón de demo.
+3. `npm run build` y push. Vercel redespliega solo.
+
+Campos del objeto de proyecto: `order`, `slug`, `name`, `tagline`, `year`,
+`category`, `platform`, `description`, `features[]`, `stack[]`,
+`highlights[{label,value}]`, `technical[{title,body}]`, `demoNote` y `repo`.
+Solo `slug` y `name` son imprescindibles: las secciones cuyo campo falte
+no se renderizan. En `technical`, los fragmentos entre acentos graves se
+muestran como código en línea.
 
 ---
 

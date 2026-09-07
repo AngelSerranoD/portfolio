@@ -9,6 +9,7 @@ import Footer from '../components/Footer';
 import TechnicalNote from '../components/TechnicalNote';
 import NotFound from './NotFound';
 import { getProject, projects } from '../data/projects';
+import { hasDemo } from '../demos';
 import { AUTHOR } from '../data/profile';
 
 export default function ProjectDetail() {
@@ -47,7 +48,7 @@ export default function ProjectDetail() {
           </p>
 
           <div className="mt-10 flex flex-wrap gap-3">
-            {project.demo && (
+            {hasDemo(project.slug) && (
               <Link to={`/demo/${project.slug}`} className="btn-primary">
                 Abrir demo
               </Link>
@@ -65,8 +66,12 @@ export default function ProjectDetail() {
           </div>
         </header>
 
-        {/* Métricas */}
-        <div className="mt-16 grid grid-cols-3 border-y border-mono-800">
+        {/* Métricas. La rejilla se adapta a cuántas haya, no siempre son tres. */}
+        {project.highlights?.length > 0 && (
+        <div
+          className="mt-16 grid border-y border-mono-800"
+          style={{ gridTemplateColumns: `repeat(${project.highlights.length}, minmax(0, 1fr))` }}
+        >
           {project.highlights.map((h, i) => (
             <div
               key={h.label}
@@ -79,6 +84,7 @@ export default function ProjectDetail() {
             </div>
           ))}
         </div>
+        )}
 
         {/* Descripción */}
         <section className="mt-20 grid gap-x-16 gap-y-6 sm:grid-cols-[160px_1fr]">
@@ -89,6 +95,7 @@ export default function ProjectDetail() {
         </section>
 
         {/* Características */}
+        {project.features?.length > 0 && (
         <section className="mt-20 grid gap-x-16 gap-y-6 sm:grid-cols-[160px_1fr]">
           <h2 className="label pt-1">Características</h2>
           <ul className="max-w-2xl">
@@ -102,6 +109,7 @@ export default function ProjectDetail() {
             ))}
           </ul>
         </section>
+        )}
 
         {/* Notas técnicas */}
         {project.technical?.length > 0 && (
@@ -121,6 +129,7 @@ export default function ProjectDetail() {
         )}
 
         {/* Tecnologías */}
+        {project.stack?.length > 0 && (
         <section className="mt-20 grid gap-x-16 gap-y-6 sm:grid-cols-[160px_1fr]">
           <h2 className="label pt-1">Tecnologías</h2>
           <ul className="flex max-w-2xl flex-wrap gap-x-6 gap-y-2 text-[15px] text-mono-300">
@@ -129,6 +138,7 @@ export default function ProjectDetail() {
             ))}
           </ul>
         </section>
+        )}
 
         {/* Nota sobre la demo */}
         {project.demoNote && (
