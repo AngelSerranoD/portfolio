@@ -1,0 +1,2 @@
+/* Dark mode overrides for DayCell backgrounds — injected via JS */
+/* We handle this in DayCell via inline style + dark class detection */
