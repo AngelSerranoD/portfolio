@@ -17,33 +17,44 @@ const C = {
   anchor: '#2F5D57',
 };
 
-// Acento por bloque, igual que en la app.
-const ACCENT = { manana: '#E0A03D', dia: '#C67C4E', noche: '#623E26' };
+// Acento por franja: oscurece según avanza el día, igual que en la app.
+const ACCENT = {
+  despertar: '#E8B15A',
+  manana: '#E0A03D',
+  mediaManana: '#D8924A',
+  comida: '#C67C4E',
+  tarde: '#B06B4A',
+  noche: '#8A5436',
+  dormir: '#623E26',
+};
 
-// El orden de esta lista ES el orden del día: la guía saca el primero que no
-// esté hecho ni apartado.
+// La lista no sigue el orden del PDF, sigue el reloj: cada entrada es una cita
+// con su hora, y lo que hay que repetir aparece tantas veces como toca.
 const EXERCISES = [
   {
     id: 'm1',
-    block: 'manana',
-    title: 'Estirarse al despertar',
-    cue: 'Al abrir los ojos',
+    block: 'despertar',
+    time: '07:00',
+    title: 'Estirarse en la cama',
+    cue: 'Sin salir de la cama',
     duration: '2 min',
     detail:
-      'Nada más abrir los ojos, sin salir de la cama y boca arriba.\n\n1. Estira los brazos por encima de la cabeza y las piernas hacia abajo.\n2. Tensa todo el cuerpo a la vez y aguanta 5 segundos.\n3. Suelta de golpe y bosteza.\n4. Repite 2 o 3 veces.',
+      'Nada más abrir los ojos, boca arriba y sin levantarte.\n\n1. Estira los brazos por encima de la cabeza y las piernas hacia abajo.\n2. Tensa todo el cuerpo a la vez y aguanta 5 segundos.\n3. Suelta de golpe y bosteza.\n4. Repite 2 o 3 veces.',
   },
   {
     id: 'm2',
-    block: 'manana',
+    block: 'despertar',
+    time: '07:05',
     title: 'Sacudirse y darse golpecitos',
-    cue: 'Nada más levantarte',
+    cue: 'De pie, descalzo si puedes',
     duration: '2 min',
     detail:
-      'De pie, descalzo si puedes.\n\n1. Rebota sobre los pies con las rodillas sueltas y deja que el temblor suba por todo el cuerpo. 1 minuto.\n2. Date golpecitos rápidos: pecho y clavículas, brazos, piernas, cara y cabeza. 1 minuto.',
+      'Ya de pie, nada más salir de la cama.\n\n1. Rebota sobre los pies con las rodillas sueltas y deja que el temblor suba por todo el cuerpo. 1 minuto.\n2. Date golpecitos rápidos: pecho y clavículas, brazos, piernas, cara y cabeza. 1 minuto.',
   },
   {
     id: 'm3',
-    block: 'manana',
+    block: 'despertar',
+    time: '07:10',
     title: 'Agua tibia con limón y sal',
     cue: 'Antes de desayunar',
     duration: '2 min',
@@ -53,15 +64,17 @@ const EXERCISES = [
   {
     id: 'm4',
     block: 'manana',
+    time: '07:20',
     title: 'Hipoxia intermitente',
-    cue: 'En ayunas',
+    cue: 'En ayunas, sentado o tumbado',
     duration: '10 min',
     detail:
-      'Siéntate o túmbate antes de empezar. Nunca de pie.\n\n1. Haz 30 respiraciones seguidas, hondas y sin pausa entre ellas.\n2. Suelta el aire y aguanta vacío hasta que el cuerpo te pida aire de verdad.\n3. Coge aire, retenlo 15 segundos y suéltalo.\n4. Respira normal durante un minuto.\n\n3 rondas en total.',
+      'Siéntate o túmbate antes de empezar. Nunca de pie.\n\n1. Haz 30 respiraciones seguidas, hondas y sin pausa.\n2. Suelta el aire y aguanta vacío hasta que el cuerpo lo pida.\n3. Coge aire, retenlo 15 segundos y suéltalo.\n4. Respira normal un minuto.\n\n3 rondas en total.',
   },
   {
     id: 'm5',
     block: 'manana',
+    time: '07:35',
     title: 'Ducha de agua fría y caliente',
     cue: 'Al final de la ducha',
     duration: '2 min',
@@ -71,69 +84,136 @@ const EXERCISES = [
   {
     id: 'm6',
     block: 'manana',
+    time: '07:45',
     title: 'Gárgaras',
     cue: 'Tras lavarte los dientes',
     duration: '2 min',
+    repeat: '1 de 2',
     detail:
-      '1. Da un trago de agua sin tragarla y echa la cabeza hacia atrás.\n2. Haz gárgaras con fuerza hasta quedarte sin aire.\n3. Escupe y vuelve a empezar hasta completar los 2 minutos.',
+      'Primera tanda del día. La otra es antes de dormir.\n\n1. Trago de agua sin tragarla, cabeza hacia atrás.\n2. Gárgaras con fuerza hasta quedarte sin aire.\n3. Escupe y repite hasta completar los 2 minutos.',
   },
   {
     id: 'm7',
     block: 'manana',
+    time: '08:00',
     title: 'Caminar al sol',
-    cue: 'Primeras 2 horas del día',
+    cue: 'Dentro de las 2 primeras horas',
     duration: '15 min',
     detail:
-      '1. Sal a la calle. Aunque esté nublado sirve.\n2. Camina a paso cómodo.\n3. Respira por la nariz, con la boca cerrada.\n4. Mira lo más lejos que puedas, con la vista ancha y sin fijarla en nada.',
+      'Tiene que caer dentro de las dos primeras horas tras levantarte.\n\n1. Sal a la calle. Aunque esté nublado sirve.\n2. Camina a paso cómodo.\n3. Respira por la nariz.\n4. Mira lo más lejos que puedas, con la vista ancha.',
   },
   {
     id: 'd1',
-    block: 'dia',
-    title: 'Levantarse cada hora',
-    cue: 'Cada hora sentado',
+    block: 'mediaManana',
+    time: '11:00',
+    title: 'Levantarse y moverse',
+    cue: 'Llevas toda la mañana sentado',
     duration: '2 min',
+    repeat: '1 de 3',
     detail:
-      '1. Levántate de la silla.\n2. Muévete hasta notar el corazón algo más rápido.\n3. Estírate: brazos arriba y hombros atrás.\n4. Asómate a una ventana y mira lejos 30 segundos.',
-  },
-  {
-    id: 'd2',
-    block: 'dia',
-    title: 'Cantar',
-    cue: 'Cuando vayas solo',
-    duration: '5 min',
-    detail:
-      '1. Canta en voz alta y con ganas. Da igual afinar.\n2. Busca las partes graves y las notas largas.\n3. Pon una mano en el pecho para notar la vibración.',
-  },
-  {
-    id: 'd3',
-    block: 'dia',
-    title: '10 respiraciones antes de comer',
-    cue: 'Con el plato delante',
-    duration: '2 min',
-    detail:
-      '1. Haz 10 respiraciones lentas por la nariz.\n2. Que soltar dure el doble que coger: cuenta 4 y 8.\n3. Come sin pantallas y mastica cada bocado hasta que se deshaga.',
+      'Primer corte del día.\n\n1. Levántate.\n2. Muévete hasta notar el corazón más rápido: escaleras, andar ligero o 15 sentadillas.\n3. Estírate y abre el pecho.\n4. Mira lejos por la ventana 30 segundos.',
   },
   {
     id: 'd4',
-    block: 'dia',
+    block: 'mediaManana',
+    time: '11:30',
     title: 'Un minuto de «voooo»',
-    cue: 'Cuando notes que te vas',
+    cue: 'Donde puedas hacer algo de ruido',
     duration: '1 min',
+    repeat: '1 de 3',
     detail:
-      '1. Coge aire por la nariz sin llenarte del todo.\n2. Al soltarlo, di «voooo» con voz grave y alargada.\n3. Pon la mano en el pecho o la garganta y busca la vibración.\n4. Repite durante un minuto.',
+      'Primera de las tres del día.\n\n1. Coge aire por la nariz sin llenarte del todo.\n2. Suéltalo diciendo «voooo», grave y largo.\n3. Mano en el pecho, buscando la vibración.\n4. Repite durante un minuto.',
+  },
+  {
+    id: 'd3',
+    block: 'comida',
+    time: '14:00',
+    title: '10 respiraciones antes de comer',
+    cue: 'Con el plato delante',
+    duration: '2 min',
+    repeat: '1 de 2',
+    detail:
+      '1. Haz 10 respiraciones lentas por la nariz.\n2. Que soltar dure el doble que coger: cuenta 4 y 8.\n3. Come sin pantallas y mastica hasta que se deshaga.',
+  },
+  {
+    id: 'd1b',
+    block: 'tarde',
+    time: '15:30',
+    title: 'Levantarse y moverse',
+    cue: 'Después de comer, contra el sopor',
+    duration: '2 min',
+    repeat: '2 de 3',
+    detail:
+      'Segundo corte, justo en la bajada de después de comer.\n\n1. Levántate.\n2. Muévete hasta notar el corazón más rápido.\n3. Estírate: brazos arriba y hombros atrás.\n4. Mira lejos por la ventana 30 segundos.',
+  },
+  {
+    id: 'd4b',
+    block: 'tarde',
+    time: '16:00',
+    title: 'Un minuto de «voooo»',
+    cue: 'El bajón de media tarde',
+    duration: '1 min',
+    repeat: '2 de 3',
+    detail:
+      'Segunda de las tres, y la que más sirve: media tarde es cuando suele subir la sensación de irrealidad.\n\n1. Coge aire por la nariz.\n2. Suéltalo diciendo «voooo», grave y largo.\n3. Mano en el pecho.\n4. Un minuto.',
+  },
+  {
+    id: 'd2',
+    block: 'tarde',
+    time: '17:30',
+    title: 'Cantar',
+    cue: 'En el coche, la ducha o con auriculares',
+    duration: '5 min',
+    detail:
+      '1. Canta en voz alta y con ganas. Da igual afinar.\n2. Busca las partes graves y las notas largas.\n3. Mano en el pecho de vez en cuando para notar la vibración.',
+  },
+  {
+    id: 'd1c',
+    block: 'tarde',
+    time: '18:30',
+    title: 'Levantarse y moverse',
+    cue: 'Antes de que se acabe la tarde',
+    duration: '2 min',
+    repeat: '3 de 3',
+    detail:
+      'Tercer y último corte del día.\n\n1. Levántate.\n2. Muévete hasta notar el corazón más rápido.\n3. Estírate.\n4. Si todavía hay luz fuera, sal a la calle un momento en vez de mirar por la ventana.',
+  },
+  {
+    id: 'd4c',
+    block: 'tarde',
+    time: '19:00',
+    title: 'Un minuto de «voooo»',
+    cue: 'Cierre de la jornada',
+    duration: '1 min',
+    repeat: '3 de 3',
+    detail:
+      'Tercera y última. Esta ya no es para espabilar, es para cerrar la jornada.\n\n1. Coge aire por la nariz.\n2. Suéltalo diciendo «voooo».\n3. Mano en el pecho.\n4. Un minuto, más despacio que las anteriores.',
   },
   {
     id: 'n1',
     block: 'noche',
+    time: '20:00',
     title: 'Suspiros fisiológicos',
-    cue: 'Al caer la tarde',
+    cue: 'Sentado o tumbado',
     duration: '5 min',
     detail:
-      '1. Coge aire por la nariz hasta notar los pulmones llenos.\n2. Sin soltar, coge un segundo sorbito corto por encima del primero.\n3. Suelta todo por la boca, lento y largo, el doble de las dos entradas.\n4. Respira normal un par de veces y repite. 5 minutos.',
+      '1. Coge aire por la nariz hasta llenar los pulmones.\n2. Sin soltar, un segundo sorbito corto por encima.\n3. Suelta todo por la boca, lento y largo, el doble que las dos entradas.\n4. Respira normal y repite. 5 minutos.',
+  },
+  {
+    id: 'd3b',
+    block: 'noche',
+    time: '21:00',
+    title: '10 respiraciones antes de cenar',
+    cue: 'Con el plato delante',
+    duration: '2 min',
+    repeat: '2 de 2',
+    detail:
+      'Por la noche importa más: una cena mal digerida te estropea el sueño.\n\n1. 10 respiraciones lentas por la nariz.\n2. Cuenta 4 al coger y 8 al soltar.\n3. Cena ligero, pronto y sin pantallas.',
   },
   {
     id: 'n2',
     block: 'noche',
+    time: '21:45',
     title: 'Estiramientos, rodillo y balanceo',
     cue: 'Después de cenar',
     duration: '5 min',
@@ -142,28 +222,45 @@ const EXERCISES = [
   },
   {
     id: 'n3',
-    block: 'noche',
+    block: 'dormir',
+    time: '22:15',
     title: 'Masaje del nervio vago',
-    cue: 'Antes de acostarte',
+    cue: 'Con la casa ya en calma',
     duration: '8 min',
     detail:
-      'Regla que manda sobre todo lo demás: nunca debe doler.\n\n1. Cara (1 min): círculos en mandíbula, boca, ojos y sienes.\n2. Orejas (1 min): pellizca todo el contorno y haz círculos en el hueco.\n3. Cuello (1 min): círculos suaves de la oreja a la clavícula, un lado cada vez.\n4. Nuca (5 min): dos pelotas de tenis en un calcetín, bajo el hueso de la nuca.',
+      'Regla que manda sobre todo lo demás: nunca debe doler.\n\n1. Cara (1 min): círculos en mandíbula, boca, ojos y sienes.\n2. Orejas (1 min): pellizca todo el contorno y círculos en el hueco.\n3. Cuello (1 min): círculos suaves de la oreja a la clavícula, un lado cada vez.\n4. Nuca (5 min): dos pelotas de tenis en un calcetín, bajo el hueso de la nuca.',
+  },
+  {
+    id: 'n4g',
+    block: 'dormir',
+    time: '22:50',
+    title: 'Gárgaras',
+    cue: 'Tras lavarte los dientes',
+    duration: '2 min',
+    repeat: '2 de 2',
+    detail:
+      'Segunda y última tanda del día.\n\n1. Trago de agua sin tragarla, cabeza hacia atrás.\n2. Gárgaras con fuerza, buscando que la garganta vibre.\n3. Escupe y repite durante 2 minutos.\n\nA esta hora, algo más suaves que las de la mañana.',
   },
   {
     id: 'n4',
-    block: 'noche',
-    title: 'Gárgaras y respiración 4-7-8',
-    cue: 'Ya en la cama',
+    block: 'dormir',
+    time: '23:00',
+    title: 'Respiración 4-7-8 en la cama',
+    cue: 'Luz apagada y el móvil fuera',
     duration: '5 min',
     detail:
-      '1. Gárgaras otra vez, 2 minutos, después de lavarte los dientes.\n2. Ya en la cama, con la luz apagada: coge aire contando 4, retén 7, suelta 8.\n3. Repite 4 veces y ya está.',
+      'Lo último del día, ya tumbado.\n\n1. Coge aire por la nariz contando hasta 4.\n2. Retén contando hasta 7.\n3. Suéltalo por la boca contando hasta 8, dejando que haga ruido.\n4. Repite 4 veces y ya está.',
   },
 ];
 
 const BLOCKS = [
-  { id: 'manana', label: 'Mañana', sub: 'Activar y anclar' },
-  { id: 'dia', label: 'Durante el día', sub: 'Mantener presencia' },
-  { id: 'noche', label: 'Tarde-noche', sub: 'Integrar y dormir' },
+  { id: 'despertar', label: 'Al despertar', window: '07:00 – 07:15', sub: 'Salir del sueño' },
+  { id: 'manana', label: 'Primera hora', window: '07:20 – 08:20', sub: 'Activar y anclar' },
+  { id: 'mediaManana', label: 'Media mañana', window: '11:00 – 11:35', sub: 'Cortar la quietud' },
+  { id: 'comida', label: 'Mediodía', window: '14:00', sub: 'Comer en calma' },
+  { id: 'tarde', label: 'Tarde', window: '15:30 – 19:05', sub: 'Mantener presencia' },
+  { id: 'noche', label: 'Tarde-noche', window: '20:00 – 21:55', sub: 'Bajar revoluciones' },
+  { id: 'dormir', label: 'Antes de dormir', window: '22:15 – 23:05', sub: 'Integrar y dormir' },
 ];
 
 const ANCHOR_STEPS = [
@@ -267,15 +364,18 @@ function CurrentCard({ ex, number, total, accent, retaking, onDone, onSkip }) {
     >
       <div className="flex flex-wrap items-center gap-1.5">
         <Chip color={accent} filled>
-          {retaking ? 'Lo dejaste antes' : `Paso ${number} de ${total}`}
+          ⏱ {ex.time}
         </Chip>
-        <Chip>{ex.cue}</Chip>
-        <Chip>⏱ {ex.duration}</Chip>
+        <Chip>{retaking ? 'Lo dejaste antes' : `Paso ${number} de ${total}`}</Chip>
+        {ex.repeat && <Chip>↻ {ex.repeat}</Chip>}
       </div>
 
       <h3 className="mt-3 text-[17px] font-extrabold leading-tight" style={{ color: C.textPrimary }}>
         {ex.title}
       </h3>
+      <p className="mt-1 text-[11px]" style={{ color: C.textSecondary }}>
+        {ex.cue} · {ex.duration}
+      </p>
 
       <div className="my-3 h-px" style={{ backgroundColor: C.divider }} />
 
@@ -333,6 +433,9 @@ function TimelineStep({ ex, number, total, status, isLast, open, retaking, onDon
               >
                 {ex.title}
               </span>
+              <span className="text-[10px]" style={{ color: C.textSecondary }}>
+                {ex.time}
+              </span>
               <span className="text-[11px]" style={{ color: C.textSecondary }}>
                 {open ? '▲' : '▼'}
               </span>
@@ -366,9 +469,10 @@ function TimelineStep({ ex, number, total, status, isLast, open, retaking, onDon
           <div className="flex items-center gap-2 px-1 py-2.5">
             <span className="min-w-0 flex-1 text-[12.5px] font-semibold" style={{ color: C.textSecondary }}>
               {ex.title}
+              {ex.repeat && <span className="ml-1.5 font-normal">({ex.repeat})</span>}
             </span>
             <span className="shrink-0 text-[10px]" style={{ color: C.textSecondary }}>
-              {ex.cue}
+              {ex.time}
             </span>
           </div>
         )}
@@ -503,6 +607,9 @@ export default function NervioVagoDemo() {
                         <div className="min-w-0 flex-1">
                           <p className="text-[14px] font-extrabold" style={{ color: C.deepBrown }}>
                             {b.label}
+                            <span className="ml-2 text-[10.5px] font-bold" style={{ color: ACCENT[ex.block] }}>
+                              {b.window}
+                            </span>
                           </p>
                           <p className="text-[10px]" style={{ color: C.textSecondary }}>
                             {b.sub}

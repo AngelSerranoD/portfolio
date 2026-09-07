@@ -10,12 +10,13 @@ export default {
   "year": "2026",
   "category": "Salud y bienestar",
   "platform": "Android · Flutter",
-  "description": "Rutina diaria guiada de estimulación del nervio vago, extraída de la guía «Estimula tu nervio vago». Quince ejercicios repartidos en tres bloques —mañana, día y noche— más una secuencia de anclaje rápido de cuatro pasos para momentos de crisis. La pantalla principal no es una lista de tareas sueltas sino una línea temporal: enseña un solo ejercicio cada vez, con su explicación entera, y avanza al siguiente al marcarlo. Funciona completamente offline: sin cuentas, sin backend y sin analítica.",
+  "description": "Rutina diaria guiada de estimulación del nervio vago, extraída de la guía «Estimula tu nervio vago». La pantalla principal no es una lista de tareas sino una agenda: 21 citas con hora, repartidas en siete franjas desde las 07:00 hasta las 23:00, de las que la app enseña una sola cada vez con su explicación entera y avanza al marcarla. Las técnicas que hay que repetir aparecen tantas veces como toca hacerlas —tres cortes de movimiento, tres de voz, dos de respiración antes de comer y dos tandas de gárgaras— cada una en su momento del día. Incluye una secuencia de anclaje rápido de cuatro pasos para momentos de crisis. Funciona completamente offline: sin cuentas, sin backend y sin analítica.",
   "features": [
-    "Línea temporal guiada: un ejercicio cada vez, en el orden del día",
-    "Cada paso indica cuándo toca y cuánto dura",
-    "«Lo dejo para luego» aparta un ejercicio sin contarlo como hecho",
-    "15 ejercicios organizados en bloques de mañana, día y noche",
+    "Agenda del día: 21 citas con hora, de las 07:00 a las 23:00",
+    "Guía paso a paso: solo se ve la cita que toca, y avanza al marcarla",
+    "Las técnicas que se repiten salen varias veces, en su momento",
+    "Siete franjas horarias con acento de color que oscurece según el día",
+    "«Lo dejo para luego» aparta una cita sin contarla como hecha",
     "Secuencia de anclaje rápido de 4 pasos para episodios agudos",
     "Seguimiento de rachas y anillo de progreso diario",
     "Notificaciones locales programables por bloque",
@@ -32,12 +33,12 @@ export default {
   ],
   "highlights": [
     {
-      "label": "Ejercicios",
-      "value": "15"
+      "label": "Citas al día",
+      "value": "21"
     },
     {
-      "label": "Bloques",
-      "value": "3"
+      "label": "Franjas",
+      "value": "7"
     },
     {
       "label": "Backend",
@@ -51,7 +52,11 @@ export default {
     },
     {
       "title": "La rutina como secuencia, no como lista",
-      "body": "La primera versión mostraba los quince ejercicios a la vez, todos marcables, y en la práctica se saltaban pasos y se perdía el hilo. La pantalla se rehízo como una línea temporal con un único paso abierto. La clave del diseño es que **no existe un índice guardado**: el ejercicio actual se deriva en cada `build` como el primero de la lista que no está ni hecho ni apartado. No hay estado que sincronizar ni que pueda corromperse al desmarcar algo a mitad, y reordenar `kExercises` reordena la guía sin tocar una línea de la interfaz. «Apartado» vive en su propia clave (`skipped_v1`) precisamente para que apartar algo no pueda contar nunca como hacerlo: no toca ni el anillo de progreso ni la racha, solo deja avanzar la guía. Cuando se agotan los pendientes, la app vuelve a ofrecer los apartados en orden, de modo que la secuencia nunca se queda sin siguiente paso mientras quede algo por hacer."
+      "body": "La primera versión mostraba los ejercicios a la vez, todos marcables y en el orden en que los agrupaba la guía original, que además escondía las repeticiones dentro del texto («cada hora», «dos o tres veces al día»). La lista se rehízo siguiendo el reloj en lugar del índice del PDF, y la pantalla como una línea temporal con un único paso abierto. La clave del diseño es que **no existe un índice guardado**: el ejercicio actual se deriva en cada `build` como el primero de la lista que no está ni hecho ni apartado. No hay estado que sincronizar ni que pueda corromperse al desmarcar algo a mitad, y reordenar `kExercises` reordena la guía sin tocar una línea de la interfaz. «Apartado» vive en su propia clave (`skipped_v1`) precisamente para que apartar algo no pueda contar nunca como hacerlo: no toca ni el anillo de progreso ni la racha, solo deja avanzar la guía. Cuando se agotan los pendientes, la app vuelve a ofrecer los apartados en orden, de modo que la secuencia nunca se queda sin siguiente paso mientras quede algo por hacer."
+    },
+    {
+      "title": "Ampliar la rutina sin romper el pasado",
+      "body": "Reordenar la rutina por horas la hizo crecer de 15 a 21 citas, y eso tiene un efecto que no se ve venir: «día completo» se calculaba comparando lo marcado contra el total actual, así que subir el total habría convertido en incompletos todos los días ya cerrados y habría mandado la racha a cero de golpe. La solución fue sellar el dato: junto al historial se guarda `totals_v1`, un mapa `fecha → cuántas citas tenía la rutina ese día`, y cada día se mide contra el suyo. Los días anteriores a esa clave caen en un total heredado declarado como constante. Además, los quince identificadores de la rutina anterior se conservaron en la cita principal de cada técnica y las repeticiones nuevas llevan sufijo (`d1b`, `d1c`), de modo que el historial existente sigue contando en lugar de quedar huérfano."
     },
     {
       "title": "El día como problema de estado",
