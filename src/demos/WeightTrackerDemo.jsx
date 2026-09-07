@@ -123,15 +123,11 @@ function PhotoSlot({ label, filled }) {
         border: filled ? 'none' : `1.5px dashed ${C.textGray}55`,
       }}
     >
-      {filled ? (
-        <span className="text-2xl">🧍</span>
-      ) : (
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={C.textGray} strokeWidth="2" strokeLinecap="round">
-          <path d="M12 5v14M5 12h14" />
-        </svg>
-      )}
-      <span className="mt-1.5 text-[9.5px] font-bold uppercase" style={{ color: C.textGray }}>
+      <span className="text-[9.5px] font-bold uppercase" style={{ color: C.textGray }}>
         {label}
+      </span>
+      <span className="mt-1 text-[9px]" style={{ color: C.textGray }}>
+        {filled ? 'Subida' : 'Pendiente'}
       </span>
     </div>
   );
@@ -160,10 +156,10 @@ export default function WeightTrackerDemo() {
   };
 
   const TABS = [
-    ['hoy', 'Hoy', 'M3 10.5 12 3l9 7.5V21H3z'],
-    ['grafica', 'Gráfica', 'M3 17l5-5 4 4 6-7 3 3'],
-    ['estado', 'Estado', 'M4 7h3l2-2h6l2 2h3v12H4zM12 16a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7z'],
-    ['comparar', 'Comparar', 'M12 3v18M7 8H4v8h3zM20 8h-3v8h3z'],
+    ['hoy', 'Hoy'],
+    ['grafica', 'Gráfica'],
+    ['estado', 'Estado'],
+    ['comparar', 'Comparar'],
   ];
 
   return (
@@ -368,10 +364,13 @@ export default function WeightTrackerDemo() {
               {[f1, f2].map((f, i) => (
                 <div key={f + i} className="flex-1">
                   <div
-                    className="flex aspect-[3/4] items-center justify-center rounded-2xl text-3xl"
-                    style={{ backgroundColor: i === 0 ? C.accentBlue : C.accentTeal }}
+                    className="flex aspect-[3/4] items-center justify-center rounded-2xl text-[10px] font-bold uppercase"
+                    style={{
+                      backgroundColor: i === 0 ? C.accentBlue : C.accentTeal,
+                      color: C.textGray,
+                    }}
                   >
-                    🧍
+                    Foto
                   </div>
                   <p className="mt-2 text-center text-[12px] font-bold" style={{ color: C.textDark }}>
                     {f}
@@ -403,38 +402,20 @@ export default function WeightTrackerDemo() {
         className="flex shrink-0 items-center justify-around rounded-t-[24px] px-2 pb-6 pt-3"
         style={{ backgroundColor: C.surface, boxShadow: '0 -4px 20px rgba(0,0,0,0.06)' }}
       >
-        {TABS.map(([id, label, path]) => {
+        {TABS.map(([id, label]) => {
           const activo = tab === id;
           return (
             <button
               key={id}
               onClick={() => setTab(id)}
-              className="flex flex-1 flex-col items-center gap-1 transition"
+              className="flex-1 rounded-full py-2 text-[11px] transition"
+              style={{
+                backgroundColor: activo ? C.primaryYellow : 'transparent',
+                color: activo ? C.textDark : `${C.textGray}99`,
+                fontWeight: activo ? 700 : 500,
+              }}
             >
-              <span
-                className="flex h-8 w-14 items-center justify-center rounded-full transition"
-                style={{ backgroundColor: activo ? C.primaryYellow : 'transparent' }}
-              >
-                <svg
-                  width="19"
-                  height="19"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke={activo ? C.textDark : `${C.textGray}99`}
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  style={{ transform: activo ? 'scale(1.15)' : 'scale(1)' }}
-                >
-                  <path d={path} />
-                </svg>
-              </span>
-              <span
-                className="text-[10px]"
-                style={{ color: activo ? C.textDark : `${C.textGray}99`, fontWeight: activo ? 700 : 500 }}
-              >
-                {label}
-              </span>
+              {label}
             </button>
           );
         })}

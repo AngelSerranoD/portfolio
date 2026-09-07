@@ -21,7 +21,6 @@ const SECTIONS = {
   escoliosis: {
     titulo: 'Escoliosis',
     subtitulo: 'Columna vertebral',
-    emoji: '🦴',
     dark: true,
     ejercicios: [
       {
@@ -71,7 +70,6 @@ const SECTIONS = {
   desrealizacion: {
     titulo: 'Desrealización',
     subtitulo: 'Sistema nervioso',
-    emoji: '🧠',
     dark: false,
     ejercicios: [
       {
@@ -127,8 +125,7 @@ function SectionCard({ seccion, hechos, onClick }) {
         border: dark ? 'none' : `1px solid ${C.border}`,
       }}
     >
-      <div className="flex items-start justify-between">
-        <span className="text-[26px]">{seccion.emoji}</span>
+      <div className="flex items-start justify-end">
         <span
           className="rounded-full px-2.5 py-1 text-[11px] font-bold"
           style={{
@@ -178,11 +175,7 @@ function EjercicioCard({ ejercicio, hecho, onToggle }) {
           }}
           aria-label={hecho ? 'Marcar como pendiente' : 'Marcar como hecho'}
         >
-          {hecho && (
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke={C.darkSurface} strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M20 6 9 17l-5-5" />
-            </svg>
-          )}
+          {hecho && <span className="h-[9px] w-[9px] rounded-sm" style={{ backgroundColor: C.darkSurface }} />}
         </button>
 
         <button onClick={() => setAbierto((v) => !v)} className="min-w-0 flex-1 text-left">
@@ -267,12 +260,9 @@ export default function SaludDiariaDemo() {
           <div className="shrink-0 px-6 pt-4">
             <button
               onClick={() => setPantalla('home')}
-              className="flex items-center gap-1.5 text-[13px] font-bold"
+              className="text-[13px] font-bold"
               style={{ color: C.textSecondary }}
             >
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                <path d="m15 18-6-6 6-6" />
-              </svg>
               Volver
             </button>
 

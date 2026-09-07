@@ -1,8 +1,12 @@
 # Portfolio · Ángel Serrano Domínguez
 
 Portfolio web de proyectos de aplicaciones. Cada proyecto tiene su ficha con
-descripción y características, y una **demo interactiva** que se abre en una
-pestaña nueva dentro de un marco de móvil.
+descripción, características y **notas técnicas** sobre las decisiones de
+arquitectura, además de una **demo interactiva** que se ejecuta dentro de un
+marco de móvil.
+
+El diseño es deliberadamente monocromo y sin iconografía: solo tipografía,
+espacio y reglas horizontales.
 
 🔗 **En producción:** _(pendiente de desplegar en Vercel)_
 
@@ -75,7 +79,8 @@ src/
 
 ### Añadir un proyecto nuevo
 
-1. Añadir su entrada a `src/data/projects.js`.
+1. Añadir su entrada a `src/data/projects.js`, incluido el array `technical`
+   con las notas de arquitectura.
 2. Crear la demo en `src/demos/` y registrarla en `src/demos/index.js` con el
    mismo `slug`.
 3. `npm run build` para comprobar que compila.

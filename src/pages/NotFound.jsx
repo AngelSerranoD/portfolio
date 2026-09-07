@@ -5,10 +5,16 @@ import { Link } from 'react-router-dom';
 
 export default function NotFound() {
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center gap-6 px-6 text-center">
-      <p className="font-display text-7xl font-extrabold text-white/10">404</p>
-      <h1 className="font-display text-2xl font-bold">Esta página no existe</h1>
-      <Link to="/" className="btn-primary">Volver al portfolio</Link>
+    <div className="flex min-h-screen flex-col items-center justify-center gap-7 px-6 text-center">
+      <p className="font-display text-7xl font-extrabold tracking-tightest text-mono-700">
+        404
+      </p>
+      <h1 className="font-display text-2xl font-bold tracking-tight">
+        Esta página no existe
+      </h1>
+      <Link to="/" className="btn-primary">
+        Volver al portfolio
+      </Link>
     </div>
   );
 }

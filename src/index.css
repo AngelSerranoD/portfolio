@@ -12,49 +12,45 @@
   }
 
   body {
-    @apply bg-ink-950 text-white font-sans antialiased;
+    @apply bg-mono-950 font-sans text-mono-50 antialiased;
     margin: 0;
   }
 
   ::selection {
-    @apply bg-accent text-ink-950;
+    @apply bg-mono-50 text-mono-950;
   }
 }
 
 @layer components {
   .container-page {
-    @apply mx-auto w-full max-w-6xl px-6 sm:px-8;
+    @apply mx-auto w-full max-w-5xl px-6 sm:px-10;
   }
 
-  .surface {
-    @apply rounded-card border border-white/10 bg-ink-900;
+  /* Etiqueta discreta: texto, no cápsula de color. */
+  .label {
+    @apply text-[11px] uppercase tracking-[0.18em] text-mono-400;
   }
 
-  .chip {
-    @apply inline-flex items-center rounded-full border border-white/10 bg-white/5
-           px-3 py-1 text-xs font-medium text-white/70;
+  /* Separador horizontal, la única división estructural del diseño. */
+  .rule {
+    @apply border-t border-mono-700;
   }
 
   .btn-primary {
-    @apply inline-flex items-center justify-center gap-2 rounded-full bg-accent
-           px-6 py-3 text-sm font-semibold text-ink-950 transition
-           hover:bg-accent-soft active:scale-[0.98];
+    @apply inline-flex items-center justify-center rounded-full bg-mono-50 px-7 py-3
+           text-sm font-semibold text-mono-950 transition-colors duration-300
+           hover:bg-mono-200;
   }
 
   .btn-ghost {
-    @apply inline-flex items-center justify-center gap-2 rounded-full border
-           border-white/15 px-6 py-3 text-sm font-semibold text-white/80
-           transition hover:border-white/30 hover:text-white active:scale-[0.98];
+    @apply inline-flex items-center justify-center rounded-full border border-mono-600
+           px-7 py-3 text-sm font-semibold text-mono-200 transition-colors duration-300
+           hover:border-mono-300 hover:text-mono-50;
   }
-}
 
-/* Rejilla decorativa del hero */
-.grid-bg {
-  background-image:
-    linear-gradient(to right, rgba(255, 255, 255, 0.04) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
-  background-size: 64px 64px;
-  mask-image: radial-gradient(ellipse 80% 60% at 50% 0%, #000 40%, transparent 100%);
+  .link-quiet {
+    @apply text-mono-400 transition-colors duration-300 hover:text-mono-50;
+  }
 }
 
 /* Scroll interno de las demos, sin barra visible */

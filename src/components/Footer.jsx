@@ -5,10 +5,12 @@ import { AUTHOR, EMAIL } from '../data/profile';
 
 export default function Footer() {
   return (
-    <footer className="mt-32 border-t border-white/5 py-10">
-      <div className="container-page flex flex-col items-center justify-between gap-3 text-xs text-white/35 sm:flex-row">
-        <p>© {new Date().getFullYear()} {AUTHOR}. Todos los derechos reservados.</p>
-        <a href={`mailto:${EMAIL}`} className="transition hover:text-white/70">
+    <footer className="mt-32 border-t border-mono-800 py-10">
+      <div className="container-page flex flex-col items-start justify-between gap-3 text-xs text-mono-500 sm:flex-row sm:items-center">
+        <p>
+          © {new Date().getFullYear()} {AUTHOR}. Todos los derechos reservados.
+        </p>
+        <a href={`mailto:${EMAIL}`} className="link-quiet">
           {EMAIL}
         </a>
       </div>

@@ -36,9 +36,9 @@ const EXERCISES = [
 ];
 
 const BLOCKS = [
-  { id: 'manana', label: 'Mañana', sub: 'Activar y anclar · 12-15 min', icon: '☀️' },
-  { id: 'dia', label: 'Día', sub: 'Cortar la quietud · 10 min', icon: '🌤️' },
-  { id: 'noche', label: 'Noche', sub: 'Bajar revoluciones · 20 min', icon: '🌙' },
+  { id: 'manana', label: 'Mañana', sub: 'Activar y anclar · 12-15 min' },
+  { id: 'dia', label: 'Día', sub: 'Cortar la quietud · 10 min' },
+  { id: 'noche', label: 'Noche', sub: 'Bajar revoluciones · 20 min' },
 ];
 
 const ANCHOR_STEPS = [
@@ -103,11 +103,7 @@ function ExerciseCard({ ex, done, onToggle }) {
           backgroundColor: done ? C.primary : 'transparent',
         }}
       >
-        {done && (
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M20 6 9 17l-5-5" />
-          </svg>
-        )}
+        {done && <span className="h-[9px] w-[9px] rounded-full bg-white" />}
       </span>
       <span className="min-w-0 flex-1">
         <span
@@ -164,12 +160,9 @@ export default function NervioVagoDemo() {
             >
               <ProgressRing done={doneCount} total={total} />
               <div className="min-w-0 flex-1">
-                <div className="flex items-baseline gap-1.5">
-                  <span className="text-base">🔥</span>
-                  <span className="text-[22px] font-extrabold" style={{ color: C.primary }}>
-                    {streak}
-                  </span>
-                </div>
+                <span className="text-[22px] font-extrabold" style={{ color: C.primary }}>
+                  {streak}
+                </span>
                 <p className="text-[11.5px] font-semibold" style={{ color: C.textSecondary }}>
                   días seguidos
                 </p>
@@ -187,16 +180,13 @@ export default function NervioVagoDemo() {
               return (
                 <section key={b.id} className="mt-6">
                   <div className="flex items-center justify-between px-1">
-                    <div className="flex items-center gap-2">
-                      <span className="text-[15px]">{b.icon}</span>
-                      <div>
-                        <h2 className="text-[15px] font-extrabold" style={{ color: C.deepBrown }}>
-                          {b.label}
-                        </h2>
-                        <p className="text-[10px]" style={{ color: C.textSecondary }}>
-                          {b.sub}
-                        </p>
-                      </div>
+                    <div>
+                      <h2 className="text-[15px] font-extrabold" style={{ color: C.deepBrown }}>
+                        {b.label}
+                      </h2>
+                      <p className="text-[10px]" style={{ color: C.textSecondary }}>
+                        {b.sub}
+                      </p>
                     </div>
                     <span
                       className="rounded-full px-2.5 py-1 text-[11px] font-bold"
@@ -341,22 +331,20 @@ export default function NervioVagoDemo() {
         style={{ backgroundColor: C.surface, borderTop: `1px solid ${C.divider}` }}
       >
         {[
-          ['hoy', 'Hoy', '📋'],
-          ['anclaje', 'Anclaje', '⚓'],
-          ['perfil', 'Perfil', '📊'],
-        ].map(([id, label, icon]) => (
+          ['hoy', 'Hoy'],
+          ['anclaje', 'Anclaje'],
+          ['perfil', 'Perfil'],
+        ].map(([id, label]) => (
           <button
             key={id}
             onClick={() => setTab(id)}
-            className="flex flex-1 flex-col items-center gap-0.5 rounded-2xl py-2 transition"
-            style={{ backgroundColor: tab === id ? C.cream : 'transparent' }}
+            className="flex-1 rounded-2xl py-2.5 text-[12px] font-bold transition"
+            style={{
+              backgroundColor: tab === id ? C.cream : 'transparent',
+              color: tab === id ? C.primary : C.textSecondary,
+            }}
           >
-            <span className="text-[17px]" style={{ filter: tab === id ? 'none' : 'grayscale(1) opacity(0.5)' }}>
-              {icon}
-            </span>
-            <span className="text-[10px] font-bold" style={{ color: tab === id ? C.primary : C.textSecondary }}>
-              {label}
-            </span>
+            {label}
           </button>
         ))}
       </nav>

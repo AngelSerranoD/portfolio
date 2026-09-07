@@ -4,10 +4,9 @@
  */
 import { useEffect } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { ArrowLeft, Check, ExternalLink, Info } from 'lucide-react';
-import GithubIcon from '../components/GithubIcon';
 import Nav from '../components/Nav';
 import Footer from '../components/Footer';
+import TechnicalNote from '../components/TechnicalNote';
 import NotFound from './NotFound';
 import { getProject, projects } from '../data/projects';
 import { AUTHOR } from '../data/profile';
@@ -23,156 +22,138 @@ export default function ProjectDetail() {
 
   if (!project) return <NotFound />;
 
-  const others = projects.filter((p) => p.slug !== project.slug).slice(0, 3);
+  const others = projects.filter((p) => p.slug !== project.slug);
 
   return (
     <div className="min-h-screen">
       <Nav />
 
-      <article className="container-page pt-10">
-        <Link
-          to="/"
-          className="inline-flex items-center gap-2 text-sm text-white/40 transition hover:text-white"
-        >
-          <ArrowLeft size={15} /> Todos los proyectos
+      <article className="container-page pt-12">
+        <Link to="/" className="link-quiet text-sm">
+          Todos los proyectos
         </Link>
 
         {/* Cabecera */}
-        <header className="relative mt-8 overflow-hidden rounded-xl2 border border-white/10 bg-ink-900 p-8 sm:p-12">
-          <div
-            className="pointer-events-none absolute -right-20 -top-20 h-72 w-72 rounded-full opacity-20 blur-[90px]"
-            style={{ backgroundColor: project.accent }}
-            aria-hidden="true"
-          />
+        <header className="mt-12">
+          <p className="label">
+            {project.platform} · {project.category} · {project.year}
+          </p>
 
-          <div className="relative flex flex-wrap items-center gap-3">
-            <span
-              className="rounded-full px-3 py-1 text-xs font-semibold"
-              style={{ backgroundColor: `${project.accent}26`, color: project.accent }}
-            >
-              {project.platform}
-            </span>
-            <span className="chip">{project.category}</span>
-            <span className="chip">{project.year}</span>
-          </div>
+          <h1 className="mt-6 font-display text-5xl font-extrabold tracking-tightest sm:text-6xl">
+            {project.name}
+          </h1>
+          <p className="mt-4 max-w-xl text-lg leading-relaxed text-mono-400">
+            {project.tagline}
+          </p>
 
-          <div className="relative mt-6 flex items-center gap-4">
-            <span
-              className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl text-3xl"
-              style={{ backgroundColor: `${project.accent}1F` }}
-            >
-              {project.emoji}
-            </span>
-            <div>
-              <h1 className="font-display text-4xl font-extrabold tracking-tight sm:text-5xl">
-                {project.name}
-              </h1>
-              <p className="mt-1.5 text-white/45">{project.tagline}</p>
-            </div>
-          </div>
-
-          <div className="relative mt-8 flex flex-wrap gap-3">
+          <div className="mt-10 flex flex-wrap gap-3">
             {project.demo && (
-              <a
-                href={`/demo/${project.slug}`}
-                target="_blank"
-                rel="noreferrer"
-                className="btn-primary"
-              >
-                Abrir demo <ExternalLink size={15} />
-              </a>
+              <Link to={`/demo/${project.slug}`} className="btn-primary">
+                Abrir demo
+              </Link>
             )}
-            {project.repo ? (
-              <a href={project.repo} target="_blank" rel="noreferrer noopener" className="btn-ghost">
-                <GithubIcon size={15} /> Ver código
+            {project.repo && (
+              <a
+                href={project.repo}
+                target="_blank"
+                rel="noreferrer noopener"
+                className="btn-ghost"
+              >
+                Ver código
               </a>
-            ) : (
-              <span className="btn-ghost cursor-default opacity-40">
-                <GithubIcon size={15} /> Código privado
-              </span>
             )}
           </div>
         </header>
 
         {/* Métricas */}
-        <div className="mt-5 grid grid-cols-3 gap-4">
-          {project.highlights.map((h) => (
-            <div key={h.label} className="surface p-5 text-center sm:p-6">
-              <p className="font-display text-2xl font-extrabold sm:text-3xl" style={{ color: project.accent }}>
+        <div className="mt-16 grid grid-cols-3 border-y border-mono-800">
+          {project.highlights.map((h, i) => (
+            <div
+              key={h.label}
+              className={`py-8 ${i > 0 ? 'border-l border-mono-800 pl-6 sm:pl-8' : ''}`}
+            >
+              <p className="font-display text-3xl font-extrabold tracking-tightest sm:text-4xl">
                 {h.value}
               </p>
-              <p className="mt-1 text-[11px] uppercase tracking-wider text-white/35 sm:text-xs">
-                {h.label}
-              </p>
+              <p className="label mt-2">{h.label}</p>
             </div>
           ))}
         </div>
 
-        <div className="mt-5 grid gap-5 lg:grid-cols-[1.6fr_1fr]">
-          {/* Descripción y características */}
-          <div className="space-y-5">
-            <section className="surface p-8">
-              <h2 className="font-display text-lg font-bold">Sobre el proyecto</h2>
-              <p className="mt-4 leading-relaxed text-white/55">{project.description}</p>
-            </section>
+        {/* Descripción */}
+        <section className="mt-20 grid gap-x-16 gap-y-6 sm:grid-cols-[160px_1fr]">
+          <h2 className="label pt-1">Sobre el proyecto</h2>
+          <p className="max-w-2xl text-[15px] leading-[1.8] text-mono-300">
+            {project.description}
+          </p>
+        </section>
 
-            <section className="surface p-8">
-              <h2 className="font-display text-lg font-bold">Características</h2>
-              <ul className="mt-5 space-y-3.5">
-                {project.features.map((f) => (
-                  <li key={f} className="flex gap-3 text-sm leading-relaxed text-white/60">
-                    <Check size={16} className="mt-0.5 shrink-0" style={{ color: project.accent }} />
-                    <span>{f}</span>
-                  </li>
-                ))}
-              </ul>
-            </section>
-          </div>
+        {/* Características */}
+        <section className="mt-20 grid gap-x-16 gap-y-6 sm:grid-cols-[160px_1fr]">
+          <h2 className="label pt-1">Características</h2>
+          <ul className="max-w-2xl">
+            {project.features.map((f) => (
+              <li
+                key={f}
+                className="border-b border-mono-800 py-3.5 text-[15px] leading-relaxed text-mono-300 first:pt-0 last:border-b-0"
+              >
+                {f}
+              </li>
+            ))}
+          </ul>
+        </section>
 
-          {/* Lateral */}
-          <aside className="space-y-5">
-            <section className="surface p-8">
-              <h2 className="font-display text-lg font-bold">Tecnologías</h2>
-              <div className="mt-5 flex flex-wrap gap-2">
-                {project.stack.map((t) => (
-                  <span key={t} className="chip">{t}</span>
-                ))}
-              </div>
-            </section>
+        {/* Notas técnicas */}
+        {project.technical?.length > 0 && (
+          <section className="mt-20 grid gap-x-16 gap-y-8 sm:grid-cols-[160px_1fr]">
+            <div>
+              <h2 className="label pt-1">Notas técnicas</h2>
+              <p className="mt-3 max-w-[160px] text-xs leading-relaxed text-mono-500">
+                Decisiones de arquitectura y por qué se tomaron.
+              </p>
+            </div>
+            <div className="max-w-2xl">
+              {project.technical.map((note, i) => (
+                <TechnicalNote key={note.title} note={note} index={i} />
+              ))}
+            </div>
+          </section>
+        )}
 
-            {project.demoNote && (
-              <section className="rounded-card border border-white/10 bg-white/[0.03] p-6">
-                <div className="flex gap-3">
-                  <Info size={16} className="mt-0.5 shrink-0 text-white/40" />
-                  <p className="text-sm leading-relaxed text-white/45">{project.demoNote}</p>
-                </div>
-              </section>
-            )}
-          </aside>
-        </div>
+        {/* Tecnologías */}
+        <section className="mt-20 grid gap-x-16 gap-y-6 sm:grid-cols-[160px_1fr]">
+          <h2 className="label pt-1">Tecnologías</h2>
+          <ul className="flex max-w-2xl flex-wrap gap-x-6 gap-y-2 text-[15px] text-mono-300">
+            {project.stack.map((t) => (
+              <li key={t}>{t}</li>
+            ))}
+          </ul>
+        </section>
+
+        {/* Nota sobre la demo */}
+        {project.demoNote && (
+          <section className="mt-20 grid gap-x-16 gap-y-6 sm:grid-cols-[160px_1fr]">
+            <h2 className="label pt-1">Sobre la demo</h2>
+            <p className="max-w-2xl text-[15px] leading-relaxed text-mono-400">
+              {project.demoNote}
+            </p>
+          </section>
+        )}
 
         {/* Otros proyectos */}
-        <section className="mt-16">
-          <h2 className="border-b border-white/5 pb-5 font-display text-lg font-bold">
-            Otros proyectos
-          </h2>
-          <div className="mt-6 grid gap-4 sm:grid-cols-3">
+        <section className="mt-24">
+          <h2 className="label">Otros proyectos</h2>
+          <div className="mt-6 border-b border-mono-800">
             {others.map((p) => (
               <Link
                 key={p.slug}
                 to={`/proyecto/${p.slug}`}
-                className="group flex items-center gap-3 rounded-card border border-white/10 bg-ink-900 p-5 transition hover:border-white/20 hover:bg-ink-850"
+                className="group flex items-baseline justify-between gap-6 border-t border-mono-800 py-5 transition-colors duration-500 hover:border-mono-500"
               >
-                <span
-                  className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-lg"
-                  style={{ backgroundColor: `${p.accent}1F` }}
-                >
-                  {p.emoji}
+                <span className="font-display text-lg font-bold tracking-tight text-mono-300 transition-colors duration-500 group-hover:text-mono-50">
+                  {p.name}
                 </span>
-                <div className="min-w-0">
-                  <p className="truncate font-semibold">{p.name}</p>
-                  <p className="truncate text-xs text-white/35">{p.category}</p>
-                </div>
+                <span className="shrink-0 text-xs text-mono-500">{p.platform}</span>
               </Link>
             ))}
           </div>
