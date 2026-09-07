@@ -1,7 +1,7 @@
 /**
  * Copyright (c) 2026 Ángel Serrano Domínguez. Todos los derechos reservados.
  */
-import { AUTHOR, EMAIL } from '../data/profile';
+import { AUTHOR, EMAIL, LINKEDIN, GITHUB_USER } from '../data/profile';
 
 export default function Footer() {
   return (
@@ -10,9 +10,22 @@ export default function Footer() {
         <p>
           © {new Date().getFullYear()} {AUTHOR}. Todos los derechos reservados.
         </p>
-        <a href={`mailto:${EMAIL}`} className="link-quiet">
-          {EMAIL}
-        </a>
+        <div className="flex flex-wrap items-center gap-5">
+          <a href={`mailto:${EMAIL}`} className="link-quiet">
+            {EMAIL}
+          </a>
+          <a href={LINKEDIN} target="_blank" rel="noreferrer noopener" className="link-quiet">
+            LinkedIn
+          </a>
+          <a
+            href={`https://github.com/${GITHUB_USER}`}
+            target="_blank"
+            rel="noreferrer noopener"
+            className="link-quiet"
+          >
+            GitHub
+          </a>
+        </div>
       </div>
     </footer>
   );

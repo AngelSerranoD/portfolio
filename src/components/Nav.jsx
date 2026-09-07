@@ -2,7 +2,7 @@
  * Copyright (c) 2026 Ángel Serrano Domínguez. Todos los derechos reservados.
  */
 import { Link } from 'react-router-dom';
-import { GITHUB_USER, EMAIL } from '../data/profile';
+import { GITHUB_USER, LINKEDIN, CV_FILE } from '../data/profile';
 
 export default function Nav() {
   return (
@@ -15,7 +15,7 @@ export default function Nav() {
           Ángel Serrano
         </Link>
 
-        <nav className="flex items-center gap-7 text-sm">
+        <nav className="flex items-center gap-5 text-sm sm:gap-7">
           {GITHUB_USER && (
             <a
               href={`https://github.com/${GITHUB_USER}`}
@@ -26,8 +26,11 @@ export default function Nav() {
               GitHub
             </a>
           )}
-          <a href={`mailto:${EMAIL}`} className="link-quiet">
-            Contacto
+          <a href={LINKEDIN} target="_blank" rel="noreferrer noopener" className="link-quiet">
+            LinkedIn
+          </a>
+          <a href={CV_FILE} download className="link-quiet hidden sm:inline">
+            CV
           </a>
         </nav>
       </div>
