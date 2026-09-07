@@ -12,10 +12,13 @@ export default function PhoneFrame({ children, className = '' }) {
         <span className="absolute -left-[3px] top-[190px] h-14 w-[3px] rounded-l bg-ink-600" />
         <span className="absolute -right-[3px] top-[150px] h-20 w-[3px] rounded-r bg-ink-600" />
 
-        {/* Pantalla. Se encoge en pantallas bajas para no salirse del viewport. */}
+        {/* Pantalla. Se encoge en viewports pequeños para no desbordarlos. */}
         <div
-          className="relative w-[344px] overflow-hidden rounded-[36px] bg-black"
-          style={{ height: 'clamp(460px, calc(100dvh - 210px), 720px)' }}
+          className="relative overflow-hidden rounded-[36px] bg-black"
+          style={{
+            width: 'min(344px, calc(100vw - 76px))',
+            height: 'clamp(460px, calc(100dvh - 210px), 720px)',
+          }}
         >
           {/* Isla dinámica */}
           <div className="pointer-events-none absolute left-1/2 top-2 z-30 h-[26px] w-[92px] -translate-x-1/2 rounded-full bg-black" />
