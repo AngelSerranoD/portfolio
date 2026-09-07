@@ -37,7 +37,7 @@ export const projects = [
     ],
     demo: 'nervio-vago',
     demoNote: 'Réplica web fiel de la app Flutter. Las notificaciones del sistema solo funcionan en el dispositivo.',
-    repo: null,
+    repo: 'https://github.com/AngelSerranoD/nervio-vago',
   },
   {
     slug: 'sangria',
@@ -70,7 +70,7 @@ export const projects = [
     ],
     demo: 'sangria',
     demoNote: 'Esta es la aplicación real, no una recreación. Los datos se guardan en tu navegador.',
-    repo: null,
+    repo: 'https://github.com/AngelSerranoD/sangria',
   },
   {
     slug: 'weighttracker',
@@ -102,7 +102,7 @@ export const projects = [
     ],
     demo: 'weighttracker',
     demoNote: 'Réplica web de la interfaz Compose original, incluida la gráfica dibujada a mano.',
-    repo: null,
+    repo: 'https://github.com/AngelSerranoD/WeightTracker',
   },
   {
     slug: 'salud-diaria',
@@ -134,7 +134,7 @@ export const projects = [
     ],
     demo: 'salud-diaria',
     demoNote: 'Réplica web de la interfaz Compose original con el contenido real de los ejercicios.',
-    repo: null,
+    repo: 'https://github.com/AngelSerranoD/SaludDiaria',
   },
 ];
 
