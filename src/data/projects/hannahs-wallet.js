@@ -14,6 +14,7 @@ export default {
     'Aplicación de control de gastos, ingresos y presupuestos construida sobre arquitectura limpia. No tiene servidor, cuenta ni telemetría: los movimientos se guardan cifrados con SQLCipher en el propio dispositivo y solo salen de él si el usuario exporta una copia. Incluye bloqueo biométrico, presupuestos por categoría, movimientos recurrentes, estadísticas y un gato animado que reacciona a cómo va el mes.',
   features: [
     'Gastos, ingresos, monederos y presupuestos por categoría',
+    'Reparto del total del mes: cada límite por categoría descuenta de lo libre',
     'Base de datos cifrada con SQLCipher y clave en el Keystore del sistema',
     'Bloqueo por huella, cara o PIN antes de mostrar ningún dato',
     'Movimientos recurrentes con reglas de repetición propias',

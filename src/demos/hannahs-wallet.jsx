@@ -35,6 +35,12 @@ const PRESUPUESTOS = [
   { cat: 'Salud', gastado: 34.9, limite: 90 },
 ];
 
+/** Límite global del mes: el dinero total que reparten las categorías. */
+const TOTAL_MES = 900;
+
+/** Categorías sin límite propio todavía, para el formulario de la demo. */
+const CATEGORIAS_LIBRES = ['Vivienda', 'Suscripciones', 'Ropa', 'Viajes'];
+
 const eur = (n) =>
   `${n < 0 ? '−' : '+'}${Math.abs(n).toLocaleString('es-ES', {
     minimumFractionDigits: 2,
@@ -89,9 +95,171 @@ function Barra({ valor, limite }) {
   );
 }
 
+/**
+ * Cabecera de Presupuestos: el dinero total del mes y lo que queda libre.
+ *
+ * El límite global es la bolsa; cada límite por categoría saca una parte. Sin
+ * este resumen había que sumar las tarjetas a mano para saber si cabía otra.
+ */
+function Reparto({ total, repartido, libre, n }) {
+  const pasado = libre < 0;
+  const pct = Math.round((repartido / total) * 100);
+
+  return (
+    <div
+      className="mt-4 rounded-[20px] p-4"
+      style={{
+        backgroundColor: C.surfaceAlt,
+        border: `1px solid ${pasado ? C.rosyBrown : C.outline}`,
+      }}
+    >
+      <p
+        className="text-[11px] font-bold uppercase tracking-wide"
+        style={{ color: pasado ? C.rosyBrown : C.textTertiary }}
+      >
+        {pasado ? 'Te has pasado del total' : 'Libre para nuevas categorías'}
+      </p>
+      <div className="mt-1 flex items-baseline justify-between gap-2">
+        <p
+          className="text-[28px] font-extrabold leading-none"
+          style={{ color: pasado ? C.rosyBrown : C.darkGreen }}
+        >
+          {Math.abs(libre).toFixed(2)} €
+        </p>
+        <span className="text-[12px]" style={{ color: C.textTertiary }}>
+          de {total.toFixed(2)} €
+        </span>
+      </div>
+      <div className="mt-3">
+        <Barra valor={repartido} limite={total} />
+      </div>
+      <div className="mt-2 flex items-baseline justify-between gap-2">
+        <span className="text-[11px]" style={{ color: pasado ? C.rosyBrown : C.textTertiary }}>
+          {n === 0
+            ? 'Todavía no has repartido nada por categorías.'
+            : `Repartido en ${n} ${n === 1 ? 'categoría' : 'categorías'}: ${repartido.toFixed(2)} €`}
+        </span>
+        <span className="shrink-0 text-[11px] font-extrabold" style={{ color: C.midnight }}>
+          {pct} %
+        </span>
+      </div>
+    </div>
+  );
+}
+
+/**
+ * Alta de un límite por categoría. La pista de debajo del importe descuenta en
+ * vivo lo escrito, que es donde la cuenta sirve: al decidir el número, no
+ * después de guardar.
+ */
+function NuevoLimite({ libre, usadas, onCrear }) {
+  const [abierto, setAbierto] = useState(false);
+  const [cat, setCat] = useState('');
+  const [importe, setImporte] = useState('');
+
+  const disponibles = CATEGORIAS_LIBRES.filter((c) => !usadas.includes(c));
+  const pedido = Number.parseFloat(importe.replace(',', '.')) || 0;
+  const restante = libre - pedido;
+
+  if (disponibles.length === 0) return null;
+
+  if (!abierto) {
+    return (
+      <button
+        onClick={() => setAbierto(true)}
+        className="mt-3 w-full rounded-full py-2.5 text-[12px] font-extrabold transition active:scale-[0.98]"
+        style={{ backgroundColor: C.darkGreen, color: C.beige }}
+      >
+        + Nuevo límite
+      </button>
+    );
+  }
+
+  return (
+    <div
+      className="mt-3 rounded-[20px] p-4"
+      style={{ backgroundColor: C.surface, border: `1px solid ${C.outline}` }}
+    >
+      <p className="text-[13px] font-extrabold">Nuevo límite</p>
+
+      <input
+        value={importe}
+        onChange={(e) => setImporte(e.target.value)}
+        inputMode="decimal"
+        placeholder="Límite mensual"
+        className="mt-3 w-full rounded-[14px] px-3 py-2 text-[13px] outline-none"
+        style={{ backgroundColor: C.beige, border: `1px solid ${C.outline}`, color: C.darkGreen }}
+      />
+
+      <p
+        className="mt-2 text-[11px]"
+        style={{ color: restante < 0 ? C.rosyBrown : C.textTertiary }}
+      >
+        Libre: {libre.toFixed(2)} €.{' '}
+        {restante < 0
+          ? `Con este límite te pasarías ${Math.abs(restante).toFixed(2)} € del total.`
+          : `Con este límite quedarían ${restante.toFixed(2)} €.`}
+      </p>
+
+      <p className="mt-3 text-[11px] font-bold uppercase" style={{ color: C.textTertiary }}>
+        Se aplica a
+      </p>
+      <div className="mt-2 flex flex-wrap gap-2">
+        {disponibles.map((c) => (
+          <button
+            key={c}
+            onClick={() => setCat(c)}
+            className="rounded-full px-3 py-1.5 text-[11.5px] transition"
+            style={{
+              backgroundColor: cat === c ? C.darkGreen : C.surfaceAlt,
+              color: cat === c ? C.beige : C.darkGreen,
+              fontWeight: cat === c ? 800 : 500,
+            }}
+          >
+            {c}
+          </button>
+        ))}
+      </div>
+
+      <div className="mt-4 flex gap-2">
+        <button
+          onClick={() => {
+            setAbierto(false);
+            setCat('');
+            setImporte('');
+          }}
+          className="flex-1 rounded-full py-2 text-[12px] font-bold"
+          style={{ backgroundColor: C.surfaceAlt, color: C.darkGreen }}
+        >
+          Cancelar
+        </button>
+        <button
+          disabled={!cat || pedido <= 0}
+          onClick={() => {
+            onCrear(cat, pedido);
+            setAbierto(false);
+            setCat('');
+            setImporte('');
+          }}
+          className="flex-1 rounded-full py-2 text-[12px] font-extrabold transition active:scale-[0.98] disabled:opacity-40"
+          style={{ backgroundColor: C.darkGreen, color: C.beige }}
+        >
+          Guardar
+        </button>
+      </div>
+    </div>
+  );
+}
+
 export default function HannahsWalletDemo() {
   const [tab, setTab] = useState('resumen');
   const [bloqueada, setBloqueada] = useState(true);
+  const [presupuestos, setPresupuestos] = useState(PRESUPUESTOS);
+
+  // Lo repartido y lo que queda libre del total del mes. Es la cuenta que la
+  // app enseña arriba de Presupuestos: cada categoría nueva la baja.
+  const repartido = presupuestos.reduce((a, p) => a + p.limite, 0);
+  const libre = TOTAL_MES - repartido;
 
   const { ingresos, gastos, saldo } = useMemo(() => {
     const ingresos = MOVIMIENTOS.filter((m) => m.importe > 0).reduce((a, m) => a + m.importe, 0);
@@ -194,8 +362,19 @@ export default function HannahsWalletDemo() {
         {tab === 'presupuestos' && (
           <>
             <p className="pt-3 text-[24px] font-extrabold">Presupuestos</p>
+
+            <Reparto total={TOTAL_MES} repartido={repartido} libre={libre} n={presupuestos.length} />
+
+            <NuevoLimite
+              libre={libre}
+              usadas={presupuestos.map((p) => p.cat)}
+              onCrear={(cat, limite) =>
+                setPresupuestos((prev) => [...prev, { cat, gastado: 0, limite }])
+              }
+            />
+
             <div className="mt-4 space-y-3">
-              {PRESUPUESTOS.map((p) => {
+              {presupuestos.map((p) => {
                 const excedido = p.gastado > p.limite;
                 return (
                   <div
@@ -237,7 +416,7 @@ export default function HannahsWalletDemo() {
               Gasto por categoría
             </p>
             <div className="mt-3 space-y-3">
-              {PRESUPUESTOS.map((p) => (
+              {presupuestos.map((p) => (
                 <div key={p.cat}>
                   <div className="flex items-baseline justify-between">
                     <span className="text-[12.5px]">{p.cat}</span>
