@@ -10,8 +10,11 @@ export default {
   "year": "2026",
   "category": "Salud y bienestar",
   "platform": "Android · Flutter",
-  "description": "Checklist diaria de ejercicios de estimulación del nervio vago, extraídos de la guía «Estimula tu nervio vago». Quince ejercicios repartidos en tres bloques —mañana, día y noche— más una secuencia de anclaje rápido de cuatro pasos para momentos de crisis. Funciona completamente offline: sin cuentas, sin backend y sin analítica.",
+  "description": "Rutina diaria guiada de estimulación del nervio vago, extraída de la guía «Estimula tu nervio vago». Quince ejercicios repartidos en tres bloques —mañana, día y noche— más una secuencia de anclaje rápido de cuatro pasos para momentos de crisis. La pantalla principal no es una lista de tareas sueltas sino una línea temporal: enseña un solo ejercicio cada vez, con su explicación entera, y avanza al siguiente al marcarlo. Funciona completamente offline: sin cuentas, sin backend y sin analítica.",
   "features": [
+    "Línea temporal guiada: un ejercicio cada vez, en el orden del día",
+    "Cada paso indica cuándo toca y cuánto dura",
+    "«Lo dejo para luego» aparta un ejercicio sin contarlo como hecho",
     "15 ejercicios organizados en bloques de mañana, día y noche",
     "Secuencia de anclaje rápido de 4 pasos para episodios agudos",
     "Seguimiento de rachas y anillo de progreso diario",
@@ -45,6 +48,10 @@ export default {
     {
       "title": "Estado y modelo de datos",
       "body": "El estado global vive en un `AppState` que extiende `ChangeNotifier` y se inyecta con Provider. El historial no se guarda como una lista de eventos sino como un mapa `fecha → Set<id de ejercicio>`, serializado a JSON bajo la clave versionada `history_v1` en SharedPreferences. Esa forma hace que consultar «¿está hecho este ejercicio hoy?» sea O(1) (`_history[_todayKey]?.contains(id)`) y que calcular una racha sea recorrer claves de fecha hacia atrás, sin necesidad de base de datos ni de índices."
+    },
+    {
+      "title": "La rutina como secuencia, no como lista",
+      "body": "La primera versión mostraba los quince ejercicios a la vez, todos marcables, y en la práctica se saltaban pasos y se perdía el hilo. La pantalla se rehízo como una línea temporal con un único paso abierto. La clave del diseño es que **no existe un índice guardado**: el ejercicio actual se deriva en cada `build` como el primero de la lista que no está ni hecho ni apartado. No hay estado que sincronizar ni que pueda corromperse al desmarcar algo a mitad, y reordenar `kExercises` reordena la guía sin tocar una línea de la interfaz. «Apartado» vive en su propia clave (`skipped_v1`) precisamente para que apartar algo no pueda contar nunca como hacerlo: no toca ni el anillo de progreso ni la racha, solo deja avanzar la guía. Cuando se agotan los pendientes, la app vuelve a ofrecer los apartados en orden, de modo que la secuencia nunca se queda sin siguiente paso mientras quede algo por hacer."
     },
     {
       "title": "El día como problema de estado",

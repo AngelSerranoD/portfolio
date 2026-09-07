@@ -17,28 +17,153 @@ const C = {
   anchor: '#2F5D57',
 };
 
+// Acento por bloque, igual que en la app.
+const ACCENT = { manana: '#E0A03D', dia: '#C67C4E', noche: '#623E26' };
+
+// El orden de esta lista ES el orden del día: la guía saca el primero que no
+// esté hecho ni apartado.
 const EXERCISES = [
-  { id: 'm1', block: 'manana', title: 'Estirarse al despertar', hint: 'Nada más abrir los ojos, sin salir de la cama y boca arriba.' },
-  { id: 'm2', block: 'manana', title: 'Sacudirse y darse golpecitos', hint: 'De pie, descalzo si puedes. Unos 2 minutos en total.' },
-  { id: 'm3', block: 'manana', title: 'Agua tibia con limón y sal', hint: 'Antes de desayunar, a sorbos y sin prisa.' },
-  { id: 'm4', block: 'manana', title: 'Hipoxia intermitente', hint: 'Respiración fuerte seguida de aguantar sin aire. 3 rondas.' },
-  { id: 'm5', block: 'manana', title: 'Ducha de agua fría y caliente', hint: '3 ciclos al final de la ducha, terminando siempre en frío.' },
-  { id: 'm6', block: 'manana', title: 'Gárgaras', hint: 'Justo después de lavarte los dientes. 2 minutos.' },
-  { id: 'm7', block: 'manana', title: 'Caminar al sol', hint: '10-15 min dentro de las dos primeras horas tras levantarte.' },
-  { id: 'd1', block: 'dia', title: 'Levantarse cada hora', hint: 'Cada hora que pases sentado. 2 minutos.' },
-  { id: 'd2', block: 'dia', title: 'Cantar', hint: 'En el coche, la ducha o andando. 5 minutos bastan.' },
-  { id: 'd3', block: 'dia', title: '10 respiraciones antes de comer', hint: 'Con el plato delante, antes del primer bocado.' },
-  { id: 'd4', block: 'dia', title: 'Un minuto de «voooo»', hint: 'Sobre todo cuando notes que empiezas a irte.' },
-  { id: 'n1', block: 'noche', title: 'Suspiros fisiológicos', hint: 'Dos entradas de aire seguidas y una salida muy larga. 5 min.' },
-  { id: 'n2', block: 'noche', title: 'Estiramientos, rodillo y balanceo', hint: 'Tres partes seguidas, unos 5 minutos.' },
-  { id: 'n3', block: 'noche', title: 'Masaje del nervio vago', hint: 'Cara, orejas, cuello y nuca. Nunca debe doler.' },
-  { id: 'n4', block: 'noche', title: 'Gárgaras y respiración 4-7-8', hint: 'Lo último del día, ya en la cama.' },
+  {
+    id: 'm1',
+    block: 'manana',
+    title: 'Estirarse al despertar',
+    cue: 'Al abrir los ojos',
+    duration: '2 min',
+    detail:
+      'Nada más abrir los ojos, sin salir de la cama y boca arriba.\n\n1. Estira los brazos por encima de la cabeza y las piernas hacia abajo.\n2. Tensa todo el cuerpo a la vez y aguanta 5 segundos.\n3. Suelta de golpe y bosteza.\n4. Repite 2 o 3 veces.',
+  },
+  {
+    id: 'm2',
+    block: 'manana',
+    title: 'Sacudirse y darse golpecitos',
+    cue: 'Nada más levantarte',
+    duration: '2 min',
+    detail:
+      'De pie, descalzo si puedes.\n\n1. Rebota sobre los pies con las rodillas sueltas y deja que el temblor suba por todo el cuerpo. 1 minuto.\n2. Date golpecitos rápidos: pecho y clavículas, brazos, piernas, cara y cabeza. 1 minuto.',
+  },
+  {
+    id: 'm3',
+    block: 'manana',
+    title: 'Agua tibia con limón y sal',
+    cue: 'Antes de desayunar',
+    duration: '2 min',
+    detail:
+      '1. Llena un vaso de agua tibia, no caliente.\n2. Exprime dentro medio limón.\n3. Añade una pizca de sal.\n4. Bébelo despacio, a sorbos.',
+  },
+  {
+    id: 'm4',
+    block: 'manana',
+    title: 'Hipoxia intermitente',
+    cue: 'En ayunas',
+    duration: '10 min',
+    detail:
+      'Siéntate o túmbate antes de empezar. Nunca de pie.\n\n1. Haz 30 respiraciones seguidas, hondas y sin pausa entre ellas.\n2. Suelta el aire y aguanta vacío hasta que el cuerpo te pida aire de verdad.\n3. Coge aire, retenlo 15 segundos y suéltalo.\n4. Respira normal durante un minuto.\n\n3 rondas en total.',
+  },
+  {
+    id: 'm5',
+    block: 'manana',
+    title: 'Ducha de agua fría y caliente',
+    cue: 'Al final de la ducha',
+    duration: '2 min',
+    detail:
+      '1. Agua tan caliente como aguantes, 30 segundos.\n2. Fría del todo a la cabeza, la nuca y la espalda, 10-20 segundos.\n3. Repite el ciclo 3 veces.\n4. Termina siempre en frío.',
+  },
+  {
+    id: 'm6',
+    block: 'manana',
+    title: 'Gárgaras',
+    cue: 'Tras lavarte los dientes',
+    duration: '2 min',
+    detail:
+      '1. Da un trago de agua sin tragarla y echa la cabeza hacia atrás.\n2. Haz gárgaras con fuerza hasta quedarte sin aire.\n3. Escupe y vuelve a empezar hasta completar los 2 minutos.',
+  },
+  {
+    id: 'm7',
+    block: 'manana',
+    title: 'Caminar al sol',
+    cue: 'Primeras 2 horas del día',
+    duration: '15 min',
+    detail:
+      '1. Sal a la calle. Aunque esté nublado sirve.\n2. Camina a paso cómodo.\n3. Respira por la nariz, con la boca cerrada.\n4. Mira lo más lejos que puedas, con la vista ancha y sin fijarla en nada.',
+  },
+  {
+    id: 'd1',
+    block: 'dia',
+    title: 'Levantarse cada hora',
+    cue: 'Cada hora sentado',
+    duration: '2 min',
+    detail:
+      '1. Levántate de la silla.\n2. Muévete hasta notar el corazón algo más rápido.\n3. Estírate: brazos arriba y hombros atrás.\n4. Asómate a una ventana y mira lejos 30 segundos.',
+  },
+  {
+    id: 'd2',
+    block: 'dia',
+    title: 'Cantar',
+    cue: 'Cuando vayas solo',
+    duration: '5 min',
+    detail:
+      '1. Canta en voz alta y con ganas. Da igual afinar.\n2. Busca las partes graves y las notas largas.\n3. Pon una mano en el pecho para notar la vibración.',
+  },
+  {
+    id: 'd3',
+    block: 'dia',
+    title: '10 respiraciones antes de comer',
+    cue: 'Con el plato delante',
+    duration: '2 min',
+    detail:
+      '1. Haz 10 respiraciones lentas por la nariz.\n2. Que soltar dure el doble que coger: cuenta 4 y 8.\n3. Come sin pantallas y mastica cada bocado hasta que se deshaga.',
+  },
+  {
+    id: 'd4',
+    block: 'dia',
+    title: 'Un minuto de «voooo»',
+    cue: 'Cuando notes que te vas',
+    duration: '1 min',
+    detail:
+      '1. Coge aire por la nariz sin llenarte del todo.\n2. Al soltarlo, di «voooo» con voz grave y alargada.\n3. Pon la mano en el pecho o la garganta y busca la vibración.\n4. Repite durante un minuto.',
+  },
+  {
+    id: 'n1',
+    block: 'noche',
+    title: 'Suspiros fisiológicos',
+    cue: 'Al caer la tarde',
+    duration: '5 min',
+    detail:
+      '1. Coge aire por la nariz hasta notar los pulmones llenos.\n2. Sin soltar, coge un segundo sorbito corto por encima del primero.\n3. Suelta todo por la boca, lento y largo, el doble de las dos entradas.\n4. Respira normal un par de veces y repite. 5 minutos.',
+  },
+  {
+    id: 'n2',
+    block: 'noche',
+    title: 'Estiramientos, rodillo y balanceo',
+    cue: 'Después de cenar',
+    duration: '5 min',
+    detail:
+      'Estiramientos (2 min): brazos arriba, inclinación a cada lado y giros de tronco.\n\nRodillo (2 min): túmbate a lo largo sobre él, con la columna encima y los brazos en cruz.\n\nBalanceo (1 min): abraza las rodillas y rueda despacio sobre la espalda.',
+  },
+  {
+    id: 'n3',
+    block: 'noche',
+    title: 'Masaje del nervio vago',
+    cue: 'Antes de acostarte',
+    duration: '8 min',
+    detail:
+      'Regla que manda sobre todo lo demás: nunca debe doler.\n\n1. Cara (1 min): círculos en mandíbula, boca, ojos y sienes.\n2. Orejas (1 min): pellizca todo el contorno y haz círculos en el hueco.\n3. Cuello (1 min): círculos suaves de la oreja a la clavícula, un lado cada vez.\n4. Nuca (5 min): dos pelotas de tenis en un calcetín, bajo el hueso de la nuca.',
+  },
+  {
+    id: 'n4',
+    block: 'noche',
+    title: 'Gárgaras y respiración 4-7-8',
+    cue: 'Ya en la cama',
+    duration: '5 min',
+    detail:
+      '1. Gárgaras otra vez, 2 minutos, después de lavarte los dientes.\n2. Ya en la cama, con la luz apagada: coge aire contando 4, retén 7, suelta 8.\n3. Repite 4 veces y ya está.',
+  },
 ];
 
 const BLOCKS = [
-  { id: 'manana', label: 'Mañana', sub: 'Activar y anclar · 12-15 min' },
-  { id: 'dia', label: 'Día', sub: 'Cortar la quietud · 10 min' },
-  { id: 'noche', label: 'Noche', sub: 'Bajar revoluciones · 20 min' },
+  { id: 'manana', label: 'Mañana', sub: 'Activar y anclar' },
+  { id: 'dia', label: 'Durante el día', sub: 'Mantener presencia' },
+  { id: 'noche', label: 'Tarde-noche', sub: 'Integrar y dormir' },
 ];
 
 const ANCHOR_STEPS = [
@@ -85,58 +210,237 @@ function ProgressRing({ done, total }) {
   );
 }
 
-function ExerciseCard({ ex, done, onToggle }) {
+function Chip({ children, color, filled }) {
   return (
-    <button
-      onClick={onToggle}
-      className="flex w-full items-center gap-3 rounded-[20px] p-3.5 text-left transition active:scale-[0.98]"
+    <span
+      className="rounded-[10px] px-2 py-1 text-[10px] font-bold"
       style={{
-        backgroundColor: C.surface,
-        boxShadow: '0 2px 10px rgba(49,49,49,0.06)',
-        opacity: done ? 0.6 : 1,
+        backgroundColor: filled ? color : C.cream,
+        color: filled ? '#fff' : C.textSecondary,
       }}
     >
+      {children}
+    </span>
+  );
+}
+
+/** Nodo + tramo de línea del carril izquierdo. */
+function Rail({ number, status, accent, isLast }) {
+  const done = status === 'done';
+  const active = status === 'current';
+
+  return (
+    <div className="flex w-[30px] shrink-0 flex-col items-center">
+      <div style={{ height: active ? 14 : 9 }} />
       <span
-        className="flex h-[26px] w-[26px] shrink-0 items-center justify-center rounded-full border-2 transition"
+        className="flex shrink-0 items-center justify-center rounded-full text-[10px] font-bold"
         style={{
-          borderColor: done ? C.primary : C.sand,
-          backgroundColor: done ? C.primary : 'transparent',
+          width: active ? 28 : 23,
+          height: active ? 28 : 23,
+          backgroundColor: done || active ? accent : C.surface,
+          border: `2px solid ${done || active ? accent : C.divider}`,
+          color: active ? '#fff' : C.textSecondary,
+          boxShadow: active ? `0 0 0 4px ${accent}33` : 'none',
         }}
       >
-        {done && <span className="h-[9px] w-[9px] rounded-full bg-white" />}
+        {done ? '✓' : status === 'skipped' ? '···' : number}
       </span>
-      <span className="min-w-0 flex-1">
+      {!isLast && (
         <span
-          className="block text-[13.5px] font-bold leading-snug"
-          style={{ color: C.textPrimary, textDecoration: done ? 'line-through' : 'none' }}
+          className="my-1 w-[2px] flex-1"
+          style={{ backgroundColor: done ? `${accent}66` : C.divider }}
+        />
+      )}
+    </div>
+  );
+}
+
+function CurrentCard({ ex, number, total, accent, retaking, onDone, onSkip }) {
+  return (
+    <div
+      className="rounded-[18px] p-4"
+      style={{
+        backgroundColor: C.surface,
+        border: `1.5px solid ${accent}59`,
+        boxShadow: '0 6px 22px rgba(49,49,49,0.10)',
+      }}
+    >
+      <div className="flex flex-wrap items-center gap-1.5">
+        <Chip color={accent} filled>
+          {retaking ? 'Lo dejaste antes' : `Paso ${number} de ${total}`}
+        </Chip>
+        <Chip>{ex.cue}</Chip>
+        <Chip>⏱ {ex.duration}</Chip>
+      </div>
+
+      <h3 className="mt-3 text-[17px] font-extrabold leading-tight" style={{ color: C.textPrimary }}>
+        {ex.title}
+      </h3>
+
+      <div className="my-3 h-px" style={{ backgroundColor: C.divider }} />
+
+      <p className="whitespace-pre-line text-[12px] leading-relaxed" style={{ color: C.textPrimary }}>
+        {ex.detail}
+      </p>
+
+      <button
+        onClick={onDone}
+        className="mt-4 w-full rounded-[14px] py-3 text-[13px] font-bold text-white transition active:scale-[0.98]"
+        style={{ backgroundColor: accent }}
+      >
+        ✓ Hecho, siguiente
+      </button>
+
+      {!retaking && (
+        <button
+          onClick={onSkip}
+          className="mt-1 w-full py-2 text-[11.5px] font-semibold"
+          style={{ color: C.textSecondary }}
         >
-          {ex.title}
-        </span>
-        <span className="mt-0.5 block text-[11px] leading-snug" style={{ color: C.textSecondary }}>
-          {ex.hint}
-        </span>
-      </span>
-    </button>
+          Ahora no puedo, lo dejo para luego
+        </button>
+      )}
+    </div>
+  );
+}
+
+function TimelineStep({ ex, number, total, status, isLast, open, retaking, onDone, onSkip, onUndo, onUnskip, onToggle }) {
+  const accent = ACCENT[ex.block];
+
+  return (
+    <div className="flex items-stretch gap-2.5">
+      <Rail number={number} status={status} accent={accent} isLast={isLast} />
+
+      <div className="min-w-0 flex-1" style={{ paddingBottom: isLast ? 0 : 8 }}>
+        {status === 'current' && (
+          <CurrentCard
+            ex={ex}
+            number={number}
+            total={total}
+            accent={accent}
+            retaking={retaking}
+            onDone={onDone}
+            onSkip={onSkip}
+          />
+        )}
+
+        {status === 'done' && (
+          <div className="overflow-hidden rounded-[12px]" style={{ backgroundColor: C.surface }}>
+            <button onClick={onToggle} className="flex w-full items-center gap-2 px-3 py-2.5 text-left">
+              <span
+                className="min-w-0 flex-1 text-[12.5px] font-bold"
+                style={{ color: C.textSecondary, textDecoration: 'line-through' }}
+              >
+                {ex.title}
+              </span>
+              <span className="text-[11px]" style={{ color: C.textSecondary }}>
+                {open ? '▲' : '▼'}
+              </span>
+            </button>
+            {open && (
+              <div className="px-3 pb-3">
+                <div className="mb-2 h-px" style={{ backgroundColor: C.divider }} />
+                <p className="whitespace-pre-line text-[11.5px] leading-relaxed" style={{ color: C.textPrimary }}>
+                  {ex.detail}
+                </p>
+                <button onClick={onUndo} className="mt-2 text-[11px] font-bold" style={{ color: C.textSecondary }}>
+                  ↺ Desmarcar
+                </button>
+              </div>
+            )}
+          </div>
+        )}
+
+        {status === 'skipped' && (
+          <button onClick={onUnskip} className="flex w-full items-center gap-2 px-1 py-2.5 text-left">
+            <span className="min-w-0 flex-1 text-[12.5px] font-semibold" style={{ color: C.textSecondary }}>
+              {ex.title}
+            </span>
+            <span className="text-[10px] font-bold" style={{ color: C.textSecondary }}>
+              Lo dejaste ↺
+            </span>
+          </button>
+        )}
+
+        {status === 'pending' && (
+          <div className="flex items-center gap-2 px-1 py-2.5">
+            <span className="min-w-0 flex-1 text-[12.5px] font-semibold" style={{ color: C.textSecondary }}>
+              {ex.title}
+            </span>
+            <span className="shrink-0 text-[10px]" style={{ color: C.textSecondary }}>
+              {ex.cue}
+            </span>
+          </div>
+        )}
+      </div>
+    </div>
   );
 }
 
 export default function NervioVagoDemo() {
   const [tab, setTab] = useState('hoy');
-  const [done, setDone] = useState(() => new Set(['m1', 'm2', 'm6']));
+  const [done, setDone] = useState(() => new Set(['m1', 'm2', 'm3']));
+  const [skipped, setSkipped] = useState(() => new Set());
+  const [openDone, setOpenDone] = useState(null);
   const [openStep, setOpenStep] = useState(0);
 
-  const toggle = (id) =>
+  const total = EXERCISES.length;
+  const doneCount = done.size;
+  const streak = 12;
+
+  // El actual: el primero que no está hecho ni apartado. Cuando se agotan,
+  // vuelven a ofrecerse los apartados, también en orden.
+  const current =
+    EXERCISES.find((e) => !done.has(e.id) && !skipped.has(e.id)) ??
+    EXERCISES.find((e) => !done.has(e.id)) ??
+    null;
+  const retaking = current != null && skipped.has(current.id);
+  const currentStep = current ? EXERCISES.indexOf(current) + 1 : 0;
+  const skippedPending = EXERCISES.filter((e) => skipped.has(e.id) && !done.has(e.id)).length;
+
+  const markDone = (id) => {
+    setDone((prev) => new Set(prev).add(id));
+    setSkipped((prev) => {
+      const next = new Set(prev);
+      next.delete(id);
+      return next;
+    });
+  };
+  const undo = (id) => {
+    setOpenDone(null);
     setDone((prev) => {
       const next = new Set(prev);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
+      next.delete(id);
+      return next;
+    });
+  };
+  const skip = (id) => setSkipped((prev) => new Set(prev).add(id));
+  const unskip = (id) =>
+    setSkipped((prev) => {
+      const next = new Set(prev);
+      next.delete(id);
       return next;
     });
 
-  const streak = 12;
-  const total = EXERCISES.length;
-  const doneCount = done.size;
-  const complete = doneCount === total;
+  const banner = current
+    ? retaking
+      ? {
+          title: 'Vuelta a los que dejaste',
+          sub:
+            skippedPending === 1
+              ? 'Queda 1 que apartaste. Este es el momento.'
+              : `Quedan ${skippedPending} que apartaste. Uno a uno, igual que antes.`,
+        }
+      : doneCount === 0 && skippedPending === 0
+        ? { title: 'Empezamos', sub: `Paso 1 de ${total}. Ve bajando según los hagas.` }
+        : {
+            title: `Vas por el ${currentStep} de ${total}`,
+            sub:
+              skippedPending > 0
+                ? `Con ${skippedPending} apartado${skippedPending === 1 ? '' : 's'} para el final.`
+                : 'Solo tienes que mirar la tarjeta abierta.',
+          }
+    : { title: 'Día completo', sub: `${streak} días seguidos. La constancia es el mecanismo.` };
 
   return (
     <div className="flex h-full flex-col" style={{ backgroundColor: C.cream }}>
@@ -166,43 +470,83 @@ export default function NervioVagoDemo() {
                 <p className="text-[11.5px] font-semibold" style={{ color: C.textSecondary }}>
                   días seguidos
                 </p>
-                <p className="mt-2.5 text-[11.5px] leading-snug" style={{ color: C.textSecondary }}>
-                  {complete
-                    ? '¡Día completo! Nos vemos mañana.'
-                    : `Te quedan ${total - doneCount} para cerrar el día.`}
+                <p className="mt-2.5 text-[12px] font-bold leading-snug" style={{ color: C.textPrimary }}>
+                  {banner.title}
+                </p>
+                <p className="mt-0.5 text-[11px] leading-snug" style={{ color: C.textSecondary }}>
+                  {banner.sub}
                 </p>
               </div>
             </div>
 
-            {BLOCKS.map((b) => {
-              const items = EXERCISES.filter((e) => e.block === b.id);
-              const d = items.filter((e) => done.has(e.id)).length;
-              return (
-                <section key={b.id} className="mt-6">
-                  <div className="flex items-center justify-between px-1">
-                    <div>
-                      <h2 className="text-[15px] font-extrabold" style={{ color: C.deepBrown }}>
-                        {b.label}
-                      </h2>
-                      <p className="text-[10px]" style={{ color: C.textSecondary }}>
-                        {b.sub}
-                      </p>
-                    </div>
-                    <span
-                      className="rounded-full px-2.5 py-1 text-[11px] font-bold"
-                      style={{ backgroundColor: C.sand, color: C.deepBrown }}
-                    >
-                      {d}/{items.length}
-                    </span>
+            <div className="mt-6">
+              {EXERCISES.map((ex, i) => {
+                const startsBlock = i === 0 || EXERCISES[i - 1].block !== ex.block;
+                const b = BLOCKS.find((x) => x.id === ex.block);
+                const isCurrent = current != null && current.id === ex.id;
+                const status = done.has(ex.id)
+                  ? 'done'
+                  : isCurrent
+                    ? 'current'
+                    : skipped.has(ex.id)
+                      ? 'skipped'
+                      : 'pending';
+
+                return (
+                  <div key={ex.id}>
+                    {startsBlock && (
+                      <div className={`flex items-center gap-2.5 pb-2.5 ${i === 0 ? '' : 'pt-3'}`}>
+                        <span
+                          className="h-[30px] w-[30px] shrink-0 rounded-[9px]"
+                          style={{ backgroundColor: `${ACCENT[ex.block]}29` }}
+                        />
+                        <div className="min-w-0 flex-1">
+                          <p className="text-[14px] font-extrabold" style={{ color: C.deepBrown }}>
+                            {b.label}
+                          </p>
+                          <p className="text-[10px]" style={{ color: C.textSecondary }}>
+                            {b.sub}
+                          </p>
+                        </div>
+                        <span
+                          className="rounded-full px-2.5 py-1 text-[11px] font-bold"
+                          style={{ backgroundColor: `${ACCENT[ex.block]}29`, color: ACCENT[ex.block] }}
+                        >
+                          {EXERCISES.filter((e) => e.block === ex.block && done.has(e.id)).length}/
+                          {EXERCISES.filter((e) => e.block === ex.block).length}
+                        </span>
+                      </div>
+                    )}
+
+                    <TimelineStep
+                      ex={ex}
+                      number={i + 1}
+                      total={total}
+                      status={status}
+                      isLast={i === EXERCISES.length - 1}
+                      open={openDone === ex.id}
+                      retaking={isCurrent && retaking}
+                      onDone={() => markDone(ex.id)}
+                      onSkip={() => skip(ex.id)}
+                      onUndo={() => undo(ex.id)}
+                      onUnskip={() => unskip(ex.id)}
+                      onToggle={() => setOpenDone(openDone === ex.id ? null : ex.id)}
+                    />
                   </div>
-                  <div className="mt-2.5 space-y-2">
-                    {items.map((ex) => (
-                      <ExerciseCard key={ex.id} ex={ex} done={done.has(ex.id)} onToggle={() => toggle(ex.id)} />
-                    ))}
-                  </div>
-                </section>
-              );
-            })}
+                );
+              })}
+            </div>
+
+            {!current && (
+              <div className="mt-5 rounded-[20px] p-5 text-center" style={{ backgroundColor: C.sand }}>
+                <p className="text-[13px] font-extrabold" style={{ color: C.deepBrown }}>
+                  Se acabó el recorrido de hoy
+                </p>
+                <p className="mt-1 text-[11px]" style={{ color: C.textSecondary }}>
+                  Mañana vuelve a empezar por el paso 1.
+                </p>
+              </div>
+            )}
           </div>
         )}
 
