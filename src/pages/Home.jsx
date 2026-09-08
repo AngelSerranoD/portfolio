@@ -23,14 +23,14 @@ import {
 /** Fila de la cronología de formación y experiencia. */
 function TimelineRow({ title, subtitle, period, detail }) {
   return (
-    <div className="border-t border-mono-800 py-5 first:border-t-0 first:pt-0">
+    <div className="border-t border-stone py-5 first:border-t-0 first:pt-0">
       <div className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1">
-        <p className="text-[15px] font-semibold text-mono-100">{title}</p>
-        <span className="shrink-0 text-xs text-mono-500">{period}</span>
+        <p className="text-[15px] font-semibold text-ink">{title}</p>
+        <span className="shrink-0 text-xs text-clay">{period}</span>
       </div>
-      <p className="mt-1 text-sm text-mono-400">{subtitle}</p>
+      <p className="mt-1 text-sm text-slate">{subtitle}</p>
       {detail && (
-        <p className="mt-2 max-w-xl text-[14px] leading-relaxed text-mono-400">{detail}</p>
+        <p className="mt-2 max-w-xl text-[14px] leading-relaxed text-slate">{detail}</p>
       )}
     </div>
   );
@@ -59,13 +59,13 @@ export default function Home() {
       <section className="container-page pb-24 pt-24 sm:pt-36">
         <p className="label animate-fade-up">{ROLE}</p>
 
-        <h1 className="mt-7 max-w-3xl animate-fade-up font-display text-5xl font-extrabold leading-[1.04] tracking-tightest sm:text-7xl">
+        <h1 className="mt-7 max-w-3xl animate-fade-up font-display text-5xl font-bold leading-[1.04] tracking-tightest sm:text-7xl">
           Aplicaciones que
           <br />
-          <span className="text-mono-500">llegan a producción.</span>
+          <span className="text-clay">llegan a producción.</span>
         </h1>
 
-        <p className="mt-9 max-w-lg animate-fade-up text-base leading-relaxed text-mono-400">
+        <p className="mt-9 max-w-lg animate-fade-up text-base leading-relaxed text-slate">
           {INTRO}
         </p>
 
@@ -83,12 +83,12 @@ export default function Home() {
       <section className="container-page">
         <div className="flex items-baseline justify-between">
           <h2 className="label">Proyectos</h2>
-          <span className="text-xs text-mono-500">
+          <span className="text-xs text-clay">
             {String(projects.length).padStart(2, '0')}
           </span>
         </div>
 
-        <div className="mt-8 border-b border-mono-800">
+        <div className="mt-8 border-b border-stone">
           {projects.map((project, i) => (
             <ProjectRow key={project.slug} project={project} index={i} />
           ))}
@@ -99,7 +99,7 @@ export default function Home() {
       <div className="container-page">
         <Section label="Sobre mí">
           {ABOUT.map((p) => (
-            <p key={p} className="mb-4 text-[15px] leading-[1.8] text-mono-300 last:mb-0">
+            <p key={p} className="mb-4 text-[15px] leading-[1.8] text-ink last:mb-0">
               {p}
             </p>
           ))}
@@ -129,10 +129,10 @@ export default function Home() {
         </Section>
 
         <Section label="Idiomas">
-          <ul className="flex flex-wrap gap-x-8 gap-y-2 text-[15px] text-mono-300">
+          <ul className="flex flex-wrap gap-x-8 gap-y-2 text-[15px] text-ink">
             {LANGUAGES.map((l) => (
               <li key={l.name}>
-                {l.name} <span className="text-mono-500">· {l.level}</span>
+                {l.name} <span className="text-clay">· {l.level}</span>
               </li>
             ))}
           </ul>
@@ -140,7 +140,7 @@ export default function Home() {
 
         {/* Contacto */}
         <Section label="Contacto">
-          <p className="text-[15px] leading-relaxed text-mono-300">
+          <p className="text-[15px] leading-relaxed text-ink">
             {LOCATION}. Disponible para incorporarme a un equipo donde seguir
             construyendo producto.
           </p>

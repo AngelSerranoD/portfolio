@@ -6,11 +6,11 @@ export default function PhoneFrame({ children }) {
   return (
     <div className="relative">
       {/* Carcasa */}
-      <div className="relative rounded-[44px] bg-mono-800 p-[10px] shadow-[0_40px_90px_-25px_rgba(0,0,0,0.9)] ring-1 ring-mono-700">
+      <div className="relative rounded-[44px] bg-ink p-[10px] shadow-[0_40px_90px_-25px_rgba(0,0,0,0.9)] ring-1 ring-ink">
         {/* Botones laterales */}
-        <span className="absolute -left-[3px] top-[120px] h-14 w-[3px] rounded-l bg-mono-600" />
-        <span className="absolute -left-[3px] top-[190px] h-14 w-[3px] rounded-l bg-mono-600" />
-        <span className="absolute -right-[3px] top-[150px] h-20 w-[3px] rounded-r bg-mono-600" />
+        <span className="absolute -left-[3px] top-[120px] h-14 w-[3px] rounded-l bg-clay" />
+        <span className="absolute -left-[3px] top-[190px] h-14 w-[3px] rounded-l bg-clay" />
+        <span className="absolute -right-[3px] top-[150px] h-20 w-[3px] rounded-r bg-clay" />
 
         {/* Pantalla. Se encoge en viewports pequeños para no desbordarlos. */}
         <div

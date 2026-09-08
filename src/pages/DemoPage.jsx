@@ -25,15 +25,15 @@ export default function DemoPage() {
   if (!project || !Demo) return <NotFound />;
 
   return (
-    <div className="flex min-h-screen flex-col bg-mono-950">
-      <header className="border-b border-mono-800">
+    <div className="flex min-h-screen flex-col bg-paper">
+      <header className="border-b border-stone">
         <div className="container-page flex h-16 items-center justify-between gap-4">
           <Link to={`/proyecto/${project.slug}`} className="link-quiet text-sm">
             Volver a la ficha
           </Link>
 
           <div className="flex items-baseline gap-3">
-            <span className="font-display text-sm font-bold text-mono-50">
+            <span className="font-display text-sm font-bold text-ink">
               {project.name}
             </span>
             <span className="label">Demo</span>
@@ -49,8 +49,8 @@ export default function DemoPage() {
         <PhoneFrame>
           <Suspense
             fallback={
-              <div className="flex h-full items-center justify-center bg-mono-900">
-                <span className="h-6 w-6 animate-spin rounded-full border border-mono-600 border-t-mono-50" />
+              <div className="flex h-full items-center justify-center bg-stone">
+                <span className="h-6 w-6 animate-spin rounded-full border border-clay border-t-ink" />
               </div>
             }
           >
@@ -59,13 +59,13 @@ export default function DemoPage() {
         </PhoneFrame>
 
         {project.demoNote && (
-          <p className="max-w-md text-center text-xs leading-relaxed text-mono-500">
+          <p className="max-w-md text-center text-xs leading-relaxed text-clay">
             {project.demoNote}
           </p>
         )}
       </main>
 
-      <footer className="pb-6 text-center text-[11px] text-mono-600">
+      <footer className="pb-6 text-center text-[11px] text-clay">
         © {new Date().getFullYear()} {AUTHOR}
       </footer>
     </div>

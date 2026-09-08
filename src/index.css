@@ -12,12 +12,12 @@
   }
 
   body {
-    @apply bg-mono-950 font-sans text-mono-50 antialiased;
+    @apply bg-paper font-sans text-ink antialiased;
     margin: 0;
   }
 
   ::selection {
-    @apply bg-mono-50 text-mono-950;
+    @apply bg-ink text-paper;
   }
 }
 
@@ -26,30 +26,30 @@
     @apply mx-auto w-full max-w-5xl px-6 sm:px-10;
   }
 
-  /* Etiqueta discreta: texto, no cápsula de color. */
+  /* Etiqueta editorial: versalitas espaciadas, como los DETAILS de la referencia. */
   .label {
-    @apply text-[11px] uppercase tracking-[0.18em] text-mono-400;
+    @apply text-[11px] font-medium uppercase tracking-[0.18em] text-slate;
   }
 
-  /* Separador horizontal, la única división estructural del diseño. */
+  /* Regla horizontal, la única división estructural del diseño. */
   .rule {
-    @apply border-t border-mono-700;
+    @apply border-t border-stone;
   }
 
   .btn-primary {
-    @apply inline-flex items-center justify-center rounded-full bg-mono-50 px-7 py-3
-           text-sm font-semibold text-mono-950 transition-colors duration-300
-           hover:bg-mono-200;
+    @apply inline-flex items-center justify-center rounded-full bg-ink px-7 py-3
+           text-sm font-medium text-paper transition-colors duration-300
+           hover:bg-slate;
   }
 
   .btn-ghost {
-    @apply inline-flex items-center justify-center rounded-full border border-mono-600
-           px-7 py-3 text-sm font-semibold text-mono-200 transition-colors duration-300
-           hover:border-mono-300 hover:text-mono-50;
+    @apply inline-flex items-center justify-center rounded-full border border-clay
+           px-7 py-3 text-sm font-medium text-slate transition-colors duration-300
+           hover:border-ink hover:text-ink;
   }
 
   .link-quiet {
-    @apply text-mono-400 transition-colors duration-300 hover:text-mono-50;
+    @apply text-slate transition-colors duration-300 hover:text-ink;
   }
 }
 

@@ -6,11 +6,11 @@ import { GITHUB_USER, LINKEDIN, CV_FILE } from '../data/profile';
 
 export default function Nav() {
   return (
-    <header className="sticky top-0 z-40 border-b border-mono-800 bg-mono-950/85 backdrop-blur-xl">
+    <header className="sticky top-0 z-40 border-b border-stone bg-paper/85 backdrop-blur-xl">
       <div className="container-page flex h-16 items-center justify-between">
         <Link
           to="/"
-          className="font-display text-sm font-bold tracking-tight text-mono-50 transition-opacity duration-300 hover:opacity-60"
+          className="font-display text-sm font-bold tracking-tight text-ink transition-opacity duration-300 hover:opacity-60"
         >
           Ángel Serrano
         </Link>
