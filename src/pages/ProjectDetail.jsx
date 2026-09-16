@@ -53,6 +53,16 @@ export default function ProjectDetail() {
                 Abrir demo
               </Link>
             )}
+            {project.url && (
+              <a
+                href={project.url}
+                target="_blank"
+                rel="noreferrer noopener"
+                className="btn-ghost"
+              >
+                Abrir la app
+              </a>
+            )}
             {project.repo && (
               <a
                 href={project.repo}
