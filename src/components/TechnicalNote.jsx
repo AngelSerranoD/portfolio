@@ -1,9 +1,30 @@
 /**
  * Párrafo de las notas técnicas. Resuelve los fragmentos entre acentos
- * graves como código en línea, igual que en Markdown.
+ * graves como código en línea y los que van entre dobles asteriscos como
+ * negrita, igual que en Markdown.
  * Copyright (c) 2026 Ángel Serrano Domínguez. Todos los derechos reservados.
  */
+
+// Solo casa parejas completas: un `**` suelto se queda como texto.
+const BOLD = /\*\*(.+?)\*\*/;
+
+function withBold(text, key) {
+  // Con el grupo de captura, split deja en las posiciones impares lo que iba
+  // entre los asteriscos.
+  return text.split(BOLD).map((part, i) =>
+    i % 2 === 1 ? (
+      <strong key={`${key}-${i}`} className="font-bold">
+        {part}
+      </strong>
+    ) : (
+      part
+    )
+  );
+}
+
 function withInlineCode(text) {
+  // Primero se separa el código: lo que va dentro de los acentos graves no
+  // se interpreta, así que unos asteriscos ahí se muestran tal cual.
   return text.split('`').map((part, i) =>
     i % 2 === 1 ? (
       <code
@@ -13,7 +34,7 @@ function withInlineCode(text) {
         {part}
       </code>
     ) : (
-      part
+      withBold(part, i)
     )
   );
 }
