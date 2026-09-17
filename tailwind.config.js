@@ -27,6 +27,21 @@ export default {
         oxido: '#8C3B1B',
         cacao: '#5A2A1B',
         nata: '#FAF0E0',
+
+        /* Paleta propia de la demo de Ché boluda (src/demos/che-boluda). */
+        blanco: '#FFFFFF',
+        hueso: '#F4F1EC',
+        arena: '#E8E2D8',
+        lino: '#DAD3C6',
+        piedra: '#CFC7B8',
+        cuero: '#8C6444',
+        corteza: '#6E5440',
+        tinta: '#4A3526',
+      },
+      boxShadow: {
+        /* Ché boluda: relieve de "arcilla", como su icono. */
+        arcilla: 'inset 0 1.5px 0 rgba(255,255,255,0.85), 0 1px 0 rgba(140,100,68,0.18), 0 6px 16px -6px rgba(110,84,64,0.28)',
+        hundido: 'inset 0 2px 6px rgba(110,84,64,0.28), inset 0 -1px 0 rgba(255,255,255,0.7)',
       },
       fontFamily: {
         /* Ranade en toda la página, con la variable de Fontshare (100-700). */
@@ -48,12 +63,20 @@ export default {
           from: { opacity: '0', transform: 'translateY(8px)' },
           to: { opacity: '1', transform: 'translateY(0)' },
         },
+        /* Ché boluda */
+        onda: {
+          '0%': { transform: 'scale(1)', opacity: '0.55' },
+          '100%': { transform: 'scale(1.9)', opacity: '0' },
+        },
+        latido: { '0%, 100%': { transform: 'scale(1)' }, '50%': { transform: 'scale(1.06)' } },
       },
       animation: {
         'fade-up': 'fade-up 0.7s cubic-bezier(0.22,1,0.36,1) both',
         subir: 'subir 280ms cubic-bezier(0.2, 0.9, 0.3, 1)',
         fundido: 'fundido 200ms ease-out',
         asomar: 'asomar 220ms ease-out',
+        onda: 'onda 1.4s ease-out infinite',
+        latido: 'latido 1.2s ease-in-out infinite',
       },
     },
   },
