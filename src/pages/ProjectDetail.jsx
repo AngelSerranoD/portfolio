@@ -63,6 +63,12 @@ export default function ProjectDetail() {
                 Abrir la app
               </a>
             )}
+            {/* Apps nativas: enlaces directos a los instalables (APK, .exe…). */}
+            {project.downloads?.map(({ label, href }) => (
+              <a key={href} href={href} className="btn-ghost" rel="noreferrer noopener">
+                {label}
+              </a>
+            ))}
             {project.repo && (
               <a
                 href={project.repo}
