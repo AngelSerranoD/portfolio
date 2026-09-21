@@ -27,7 +27,7 @@ AQUI = os.path.dirname(os.path.abspath(__file__))
 FB = os.environ.get("CV_FUENTES", os.path.join(AQUI, "fonts"))
 SALIDA = os.path.join(AQUI, "..", "public", "CV-Angel-Serrano-Dominguez.pdf")
 
-PORTFOLIO = "https://portfolio-bay-alpha-63.vercel.app"
+PORTFOLIO = "https://aserrano.dev"
 GITHUB = "https://github.com/AngelSerranoD"
 LINKEDIN = "https://www.linkedin.com/in/%C3%A1ngel-serrano-dom%C3%ADnguez-01497a29a/"
 

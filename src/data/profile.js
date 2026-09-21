@@ -15,8 +15,15 @@ export const CV_FILE = '/CV-Angel-Serrano-Dominguez.pdf';
 /**
  * URL pública del portfolio. Es la única fuente: vite.config.js la inyecta
  * en las etiquetas Open Graph y canonical de index.html al compilar.
+ *
+ * Va con `www` porque en Vercel es el dominio principal: `aserrano.dev` a
+ * secas responde con un 308 hacia él. Las etiquetas tienen que apuntar a la
+ * dirección que sirve la página, no a una que redirige. Si algún día se
+ * invierte en Vercel (apex principal), esta constante es lo único a cambiar.
+ * Los enlaces para personas (CV, README) usan `aserrano.dev`, que funciona
+ * en ambos casos.
  */
-export const SITE_URL = 'https://portfolio-bay-alpha-63.vercel.app';
+export const SITE_URL = 'https://www.aserrano.dev';
 
 export const INTRO =
   'Construyo aplicaciones móviles y web de principio a fin: diseño la interfaz, escribo la lógica y las dejo funcionando en el dispositivo. Android nativo con Kotlin, multiplataforma con Flutter y web con React.';
