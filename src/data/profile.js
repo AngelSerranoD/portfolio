@@ -12,8 +12,11 @@ export const LINKEDIN =
   'https://www.linkedin.com/in/%C3%A1ngel-serrano-dom%C3%ADnguez-01497a29a/';
 export const CV_FILE = '/CV-Angel-Serrano-Dominguez.pdf';
 
-/** URL pública del portfolio. Se usa en las etiquetas Open Graph. */
-export const SITE_URL = 'https://portfolio-angel-serrano.vercel.app';
+/**
+ * URL pública del portfolio. Es la única fuente: vite.config.js la inyecta
+ * en las etiquetas Open Graph y canonical de index.html al compilar.
+ */
+export const SITE_URL = 'https://portfolio-bay-alpha-63.vercel.app';
 
 export const INTRO =
   'Construyo aplicaciones móviles y web de principio a fin: diseño la interfaz, escribo la lógica y las dejo funcionando en el dispositivo. Android nativo con Kotlin, multiplataforma con Flutter y web con React.';

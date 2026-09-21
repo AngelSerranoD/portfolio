@@ -7,3 +7,6 @@ dist-ssr
 .env
 .env.*
 !.env.example
+
+# Fuentes del generador del CV: se descargan solas (ver scripts/generar-cv.py)
+scripts/fonts/

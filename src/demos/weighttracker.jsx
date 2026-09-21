@@ -29,6 +29,9 @@ const HISTORY = [
   ['6 sep', 80.1],
 ];
 
+/** Peso registrado en una fecha del historial, o 0 si no existe. */
+const pesoDe = (fecha) => HISTORY.find(([d]) => d === fecha)?.[1] ?? 0;
+
 function Card({ color = C.surface, className = '', children }) {
   return (
     <div className={`rounded-[24px] p-5 ${className}`} style={{ backgroundColor: color }}>
@@ -376,7 +379,7 @@ export default function WeightTrackerDemo() {
                     {f}
                   </p>
                   <p className="text-center text-[12px]" style={{ color: C.textGray }}>
-                    {(HISTORY.find(([d]) => d === f) || [, 0])[1].toFixed(1)} kg
+                    {pesoDe(f).toFixed(1)} kg
                   </p>
                 </div>
               ))}
@@ -388,8 +391,8 @@ export default function WeightTrackerDemo() {
               </p>
               <p className="mt-1 text-[32px] font-extrabold leading-none" style={{ color: C.textDark }}>
                 {(
-                  (HISTORY.find(([d]) => d === f2) || [, 0])[1] -
-                  (HISTORY.find(([d]) => d === f1) || [, 0])[1]
+                  pesoDe(f2) -
+                  pesoDe(f1)
                 ).toFixed(1)}{' '}
                 kg
               </p>

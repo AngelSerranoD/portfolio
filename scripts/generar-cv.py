@@ -1,12 +1,21 @@
 """
 Genera el CV de Ángel Serrano Domínguez en PDF, en UNA SOLA PÁGINA.
 
-Conserva íntegro el contenido del CV original (experiencia con sus fechas,
-formación, habilidades, idiomas y carnets) y añade los proyectos personales.
-Para que quepa todo en una página se usa una retícula de dos columnas.
+Formato orientado a puestos de desarrollo junior: una sola columna en orden
+cronológico inverso (legible por los filtros ATS), competencias técnicas
+arriba y los proyectos sustituidos por el enlace al portfolio.
 
 Tipografías: Lato y Montserrat, las mismas del documento original.
+No se versionan (son 2,4 MB de binarios con licencia OFL): la primera
+ejecución las descarga del repositorio oficial de Google Fonts a
+scripts/fonts/, que está en .gitignore.
+
+Uso:  python scripts/generar-cv.py
+Escribe public/CV-Angel-Serrano-Dominguez.pdf, que es el que sirve la web.
 """
+
+import os
+import urllib.request
 
 from reportlab.lib.pagesizes import A4
 from reportlab.lib.units import mm
@@ -14,8 +23,42 @@ from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.pdfgen import canvas
 
-FB = r"C:\Users\angel\AppData\Local\Temp\claude\C--\9d143ffb-2b51-4103-92cd-6fe017945925\scratchpad\cvfonts"
-SALIDA = r"C:\dev\portfolio\public\CV-Angel-Serrano-Dominguez.pdf"
+AQUI = os.path.dirname(os.path.abspath(__file__))
+FB = os.environ.get("CV_FUENTES", os.path.join(AQUI, "fonts"))
+SALIDA = os.path.join(AQUI, "..", "public", "CV-Angel-Serrano-Dominguez.pdf")
+
+PORTFOLIO = "https://portfolio-bay-alpha-63.vercel.app"
+GITHUB = "https://github.com/AngelSerranoD"
+LINKEDIN = "https://www.linkedin.com/in/%C3%A1ngel-serrano-dom%C3%ADnguez-01497a29a/"
+
+GOOGLE_FONTS = "https://raw.githubusercontent.com/google/fonts/main/ofl"
+MONTSERRAT = {"Montserrat-Regular": 400, "Montserrat-SemiBold": 600, "Montserrat-Bold": 700}
+
+
+def asegurar_fuentes():
+    """Descarga las fuentes que falten en FB. Solo pide red la primera vez."""
+    os.makedirs(FB, exist_ok=True)
+    for nombre in ("Lato-Regular", "Lato-Bold"):
+        ruta = os.path.join(FB, f"{nombre}.ttf")
+        if not os.path.exists(ruta):
+            urllib.request.urlretrieve(f"{GOOGLE_FONTS}/lato/{nombre}.ttf", ruta)
+
+    if all(os.path.exists(os.path.join(FB, f"{n}.ttf")) for n in MONTSERRAT):
+        return
+    # Montserrat solo se publica como fuente variable: se sacan los tres pesos.
+    from fontTools.ttLib import TTFont as FontToolsFont
+    from fontTools.varLib import instancer
+
+    variable = os.path.join(FB, "Montserrat-variable.ttf")
+    urllib.request.urlretrieve(f"{GOOGLE_FONTS}/montserrat/Montserrat%5Bwght%5D.ttf", variable)
+    for nombre, peso in MONTSERRAT.items():
+        instancer.instantiateVariableFont(FontToolsFont(variable), {"wght": peso}).save(
+            os.path.join(FB, f"{nombre}.ttf")
+        )
+    os.remove(variable)
+
+
+asegurar_fuentes()
 
 for nombre in [
     "Lato-Regular",
@@ -24,18 +67,11 @@ for nombre in [
     "Montserrat-SemiBold",
     "Montserrat-Bold",
 ]:
-    pdfmetrics.registerFont(TTFont(nombre, rf"{FB}\{nombre}.ttf"))
+    pdfmetrics.registerFont(TTFont(nombre, os.path.join(FB, f"{nombre}.ttf")))
 
 W, H = A4
-MARGEN = 13 * mm
+MARGEN = 15 * mm
 ANCHO_UTIL = W - MARGEN * 2
-
-# Retícula de dos columnas
-COL_IZQ_X = MARGEN
-COL_IZQ_W = ANCHO_UTIL * 0.615
-CANAL = 7 * mm
-COL_DER_X = COL_IZQ_X + COL_IZQ_W + CANAL
-COL_DER_W = ANCHO_UTIL - COL_IZQ_W - CANAL
 
 TINTA = (0.10, 0.10, 0.10)
 GRIS = (0.38, 0.38, 0.38)
@@ -46,19 +82,26 @@ c = canvas.Canvas(SALIDA, pagesize=A4)
 c.setTitle("Currículum Vitae · Ángel Serrano Domínguez")
 c.setAuthor("Ángel Serrano Domínguez")
 c.setSubject("Desarrollador de aplicaciones multiplataforma")
-c.setKeywords("Kotlin, Flutter, React, Android, desarrollo multiplataforma")
+c.setKeywords("Kotlin, Jetpack Compose, Flutter, React, TypeScript, Android, "
+              "desarrollo multiplataforma")
+
+
+def enlace(url, x, y, texto, fuente, tam):
+    """Hace clicable el texto ya dibujado en (x, y)."""
+    ancho = pdfmetrics.stringWidth(texto, fuente, tam)
+    c.linkURL(url, (x, y - 2, x + ancho, y + tam), relative=0, thickness=0)
+    return ancho
 
 
 class Columna:
-    """Cursor vertical independiente para cada columna de la retícula."""
+    """Cursor vertical sobre el ancho útil de la página."""
 
     def __init__(self, x, ancho, y):
         self.x = x
         self.ancho = ancho
         self.y = y
 
-    # ---------------------------------------------------------------- texto
-    def parrafo(self, texto, fuente="Lato-Regular", tam=8.7, alto=10.9,
+    def parrafo(self, texto, fuente="Lato-Regular", tam=8.9, alto=11.4,
                 col=TINTA, sangria=0):
         c.setFillColorRGB(*col)
         c.setFont(fuente, tam)
@@ -76,9 +119,8 @@ class Columna:
             c.drawString(self.x + sangria, self.y, linea)
             self.y -= alto
 
-    def seccion(self, titulo, primera=False):
-        if not primera:
-            self.y -= 3.6 * mm
+    def seccion(self, titulo):
+        self.y -= 6.6 * mm
         c.setFillColorRGB(*TINTA)
         c.setFont("Montserrat-Bold", 9.0)
         c.drawString(self.x, self.y, titulo.upper())
@@ -86,204 +128,173 @@ class Columna:
         c.setStrokeColorRGB(*LINEA)
         c.setLineWidth(0.6)
         c.line(self.x, self.y, self.x + self.ancho, self.y)
-        self.y -= 3.7 * mm
+        self.y -= 4.4 * mm
 
     def puesto(self, cargo, empresa, periodo):
         c.setFillColorRGB(*TINTA)
-        c.setFont("Montserrat-SemiBold", 9.2)
+        c.setFont("Montserrat-SemiBold", 9.4)
         c.drawString(self.x, self.y, cargo)
         c.setFillColorRGB(*SUAVE)
-        c.setFont("Lato-Regular", 7.2)
+        c.setFont("Lato-Regular", 7.6)
         c.drawRightString(self.x + self.ancho, self.y, periodo)
-        self.y -= 3.5 * mm
+        self.y -= 3.7 * mm
         c.setFillColorRGB(*GRIS)
-        c.setFont("Lato-Bold", 8.4)
+        c.setFont("Lato-Bold", 8.6)
         c.drawString(self.x, self.y, empresa)
-        self.y -= 3.9 * mm
+        self.y -= 4.2 * mm
 
     def vineta(self, texto):
         c.setFillColorRGB(*TINTA)
-        c.setFont("Lato-Regular", 8.7)
+        c.setFont("Lato-Regular", 8.9)
         c.drawString(self.x + 1, self.y, "·")
         self.parrafo(texto, sangria=7)
 
-    def proyecto(self, nombre, tecnologias, descripcion):
-        c.setFillColorRGB(*TINTA)
-        c.setFont("Montserrat-SemiBold", 9.0)
-        c.drawString(self.x, self.y, nombre)
-        ancho = pdfmetrics.stringWidth(nombre, "Montserrat-SemiBold", 9.0)
-        c.setFillColorRGB(*SUAVE)
-        c.setFont("Lato-Regular", 7)
-        c.drawString(self.x + ancho + 6, self.y, tecnologias)
-        self.y -= 3.5 * mm
-        self.parrafo(descripcion, tam=8.5, alto=10.5, col=GRIS)
-        self.y -= 1.1 * mm
-
-    def bloque(self, titulo, contenido):
+    def fila(self, etiqueta, contenido, ancho_etiqueta=40 * mm):
+        """Etiqueta a la izquierda y contenido a la derecha, en la misma línea."""
         c.setFillColorRGB(*TINTA)
         c.setFont("Montserrat-SemiBold", 8.7)
-        c.drawString(self.x, self.y, titulo)
-        self.y -= 3.4 * mm
-        self.parrafo(contenido, tam=8.5, alto=10.5, col=GRIS)
-        self.y -= 1.3 * mm
+        c.drawString(self.x, self.y, etiqueta)
+        self.parrafo(contenido, tam=8.7, alto=11, col=GRIS, sangria=ancho_etiqueta)
+        self.y -= 1.0 * mm
 
 
 # ═══════════════════════════════════════════════════════════ CABECERA ═════
+tx = MARGEN
 y = H - 15 * mm
 c.setFillColorRGB(*TINTA)
 c.setFont("Montserrat-Bold", 20)
-c.drawString(MARGEN, y, "ÁNGEL SERRANO DOMÍNGUEZ")
+c.drawString(tx, y, "ÁNGEL SERRANO DOMÍNGUEZ")
 y -= 6.6 * mm
 
 c.setFillColorRGB(*GRIS)
 c.setFont("Montserrat-SemiBold", 9.6)
-c.drawString(MARGEN, y, "Desarrollador de aplicaciones multiplataforma")
+c.drawString(tx, y, "Desarrollador de aplicaciones multiplataforma")
+y -= 7.4 * mm
+
+
+def linea_contacto(y, piezas):
+    """Dibuja en una línea piezas (texto, url|None) separadas por puntos medios."""
+    x = tx
+    for i, (texto, url) in enumerate(piezas):
+        if i:
+            c.setFillColorRGB(*SUAVE)
+            c.setFont("Lato-Regular", 8.4)
+            c.drawString(x, y, "  ·  ")
+            x += pdfmetrics.stringWidth("  ·  ", "Lato-Regular", 8.4)
+        c.setFillColorRGB(*TINTA)
+        c.setFont("Lato-Regular", 8.4)
+        c.drawString(x, y, texto)
+        if url:
+            x += enlace(url, x, y, texto, "Lato-Regular", 8.4)
+        else:
+            x += pdfmetrics.stringWidth(texto, "Lato-Regular", 8.4)
+
+
+linea_contacto(y, [("Guadalajara, España", None),
+                   ("601 42 31 29", "tel:+34601423129"),
+                   ("angelsd7704@gmail.com", "mailto:angelsd7704@gmail.com")])
+y -= 4.6 * mm
+linea_contacto(y, [("github.com/AngelSerranoD", GITHUB),
+                   ("linkedin.com/in/ángel-serrano-domínguez", LINKEDIN)])
+y -= 5.6 * mm
+
+# El portfolio, destacado: es donde están todos los proyectos
+c.setFillColorRGB(*SUAVE)
+c.setFont("Lato-Regular", 7.6)
+c.drawString(tx, y, "PORTFOLIO")
+px = tx + pdfmetrics.stringWidth("PORTFOLIO", "Lato-Regular", 7.6) + 5
+c.setFillColorRGB(*TINTA)
+c.setFont("Montserrat-SemiBold", 9.2)
+texto_portfolio = PORTFOLIO.removeprefix("https://")
+c.drawString(px, y, texto_portfolio)
+enlace(PORTFOLIO, px, y, texto_portfolio, "Montserrat-SemiBold", 9.2)
+
 y -= 5.2 * mm
-
-y -= 0.6 * mm
-
 c.setStrokeColorRGB(*TINTA)
 c.setLineWidth(1.0)
 c.line(MARGEN, y, MARGEN + ANCHO_UTIL, y)
-y -= 6.2 * mm
+y -= 1.0 * mm
 
-izq = Columna(COL_IZQ_X, COL_IZQ_W, y)
-der = Columna(COL_DER_X, COL_DER_W, y)
+col = Columna(MARGEN, ANCHO_UTIL, y)
 
-# ═════════════════════════════════════════════════════ COLUMNA IZQUIERDA ══
-izq.seccion("Perfil", primera=True)
-izq.parrafo(
-    "Técnico informático con formación en desarrollo de aplicaciones multiplataforma. "
-    "Vengo del hardware —análisis y diagnóstico de equipos, reparación, recuperación de "
-    "datos, instalación de sistemas y elaboración de informes— y de ahí pasé al software. "
-    "Desarrollo aplicaciones Android nativas con Kotlin, multiplataforma con Flutter y web "
-    "con React, llevándolas de principio a fin: interfaz, lógica, persistencia y publicación. "
-    "Cuento además con experiencia en almacén: verificación de pedidos, control de inventario "
-    "y paletización."
+# ═══════════════════════════════════════════════════════════ CUERPO ═══════
+col.seccion("Perfil")
+col.parrafo(
+    "Desarrollador de aplicaciones multiplataforma (Grado Superior DAM, 2026) con base "
+    "técnica en hardware y sistemas. Desarrollo aplicaciones Android nativas con Kotlin y "
+    "Jetpack Compose, multiplataforma con Flutter y web con React y TypeScript, y las llevo "
+    "de principio a fin: interfaz, lógica, persistencia, pruebas y publicación. En mis "
+    "prácticas desarrollé GPS Trackia, un SaaS multi-tenant de geolocalización de vehículos. "
+    "Busco incorporarme a un equipo de desarrollo donde aportar desde el primer día."
 )
 
-izq.seccion("Experiencia profesional")
+col.seccion("Competencias técnicas")
+col.fila("Desarrollo móvil", "Kotlin · Jetpack Compose · Flutter · Dart · Material Design")
+col.fila("Desarrollo web", "React · TypeScript · JavaScript · Vite · Tailwind CSS · HTML y CSS")
+col.fila("Datos y persistencia", "SQLite · SQLCipher · Room · DataStore · IndexedDB · Firebase")
+col.fila("Herramientas", "Git y GitHub · Android Studio · Vercel · PWA · Notificaciones locales")
+col.fila("Sistemas", "Diagnóstico y reparación de equipos · Instalación y configuración "
+                     "de sistemas operativos · Redes")
 
-izq.puesto("Desarrollador con IA · Prácticas", "Adapta Business Consulting",
+col.seccion("Experiencia profesional")
+col.puesto("Desarrollador con IA · Prácticas", "Adapta Business Consulting",
            "Abril — Junio 2026")
-izq.vineta(
+col.vineta(
     "Creación del proyecto GPS Trackia: SaaS multi-tenant para la gestión de dispositivos "
     "de geolocalización de vehículos."
 )
-izq.y -= 1.6 * mm
+col.y -= 3.2 * mm
 
-izq.puesto("Técnico informático · Prácticas", "D.A.I Software", "Abril — Junio 2023")
-izq.vineta("Reparación de equipos antiguos y recuperación de archivos de discos duros.")
-izq.vineta("Instalación y configuración de sistemas operativos.")
-izq.vineta("Testeo de aplicaciones y elaboración de informes.")
-izq.y -= 1.6 * mm
+col.puesto("Técnico informático · Prácticas", "D.A.I Software", "Abril — Junio 2023")
+col.vineta("Reparación de equipos antiguos y recuperación de archivos de discos duros.")
+col.vineta("Instalación y configuración de sistemas operativos.")
+col.vineta("Testeo de aplicaciones y elaboración de informes.")
+col.y -= 3.2 * mm
 
-izq.puesto("Mozo de almacén", "Cofares", "Mayo — Julio 2024")
-izq.vineta(
-    "Verificación de pedidos con pistola, identificación por código de producto y paletizado."
-)
-izq.y -= 1.6 * mm
-
-izq.puesto("Mozo de almacén", "Suman Social", "Días sueltos, 2025")
-izq.vineta("17 de junio: checkeo de inventario general.")
-izq.vineta("25 al 27 de junio: limpieza de productos.")
-izq.vineta("11 de julio: descarga de productos electrónicos y paletización.")
-izq.vineta("11 al 14 de agosto: verificación de dispositivos y paletización.")
-
-izq.seccion("Proyectos personales")
-izq.parrafo(
-    "Aplicaciones desarrolladas por cuenta propia con fines de aprendizaje y uso personal. "
-    "No son productos comercializados ni publicados en tiendas de aplicaciones.",
-    tam=8.2, alto=10.0, col=SUAVE,
-)
-izq.y -= 1.4 * mm
-
-PROYECTOS = [
-    ("Hannah's Wallet", "Flutter · SQLCipher · Riverpod",
-     "Control de gastos y presupuestos sobre arquitectura limpia. Base cifrada con clave "
-     "derivada por PBKDF2 y custodiada en el almacén seguro del sistema, bloqueo biométrico "
-     "y backends separados para móvil y navegador. 16.000 líneas y 13 suites de test."),
-    ("InfoMap", "React · TypeScript · Leaflet",
-     "Mapa con GPS que muestra los lugares del entorno con datos de OpenStreetMap y resúmenes "
-     "de Wikipedia. Cacheo por teselas en IndexedDB para funcionar sin conexión."),
-    ("Sangría", "React · Vite · PWA",
-     "Calendario de seguimiento menstrual con control de píldora y predicción a partir del "
-     "historial. Instalable y sin servidor."),
-    ("Nervio Vago", "Flutter · Provider",
-     "Rutina diaria de quince ejercicios en tres bloques, con seguimiento de rachas y "
-     "notificaciones locales programadas por zona horaria."),
-    ("Sehati", "Flutter · i18n · RTL",
-     "Seguimiento de una dieta pautada en español y árabe, con inversión completa de la "
-     "dirección de lectura."),
-    ("RotateBooth", "JavaScript · Canvas · PWA",
-     "Gira varias fotos del carrete a la vez en iPhone. Modo sin pérdida que reescribe solo "
-     "la etiqueta de orientación EXIF. Sin dependencias externas."),
-    ("WeightTracker", "Kotlin · Jetpack Compose",
-     "Seguimiento de peso con gráfica de evolución dibujada sobre Canvas y comparador de "
-     "fotos entre dos fechas."),
-    ("SaludDiaria", "Kotlin · Compose · DataStore",
-     "Rutina de ejercicios terapéuticos con dos programas y progreso que se reinicia solo "
-     "cada día. MVVM sobre flujos reactivos."),
-]
-for p in PROYECTOS:
-    izq.proyecto(*p)
-
-# ══════════════════════════════════════════════════════ COLUMNA DERECHA ═══
-der.seccion("Contacto", primera=True)
-for etiqueta, valor in [
-    ("Ubicación", "Guadalajara, España"),
-    ("Teléfono", "601 42 31 29"),
-    ("Correo", "angelsd7704@gmail.com"),
-    ("Portfolio", "portfolio-angel-serrano.vercel.app"),
-    ("GitHub", "github.com/AngelSerranoD"),
-    ("LinkedIn", "linkedin.com/in/ángel-serrano-domínguez"),
-]:
-    c.setFillColorRGB(*SUAVE)
-    c.setFont("Lato-Regular", 7.2)
-    c.drawString(der.x, der.y, etiqueta)
-    der.y -= 3.5 * mm
-    der.parrafo(valor, tam=8.2, alto=10, col=TINTA)
-    der.y -= 0.7 * mm
-
-der.seccion("Formación")
-der.puesto("Grado Superior · DAM", "IES Brianda de Mendoza", "2024 — 2026")
-der.parrafo("Desarrollo de Aplicaciones Multiplataforma. Guadalajara.",
-            tam=8.3, alto=10.2, col=GRIS)
-der.y -= 2 * mm
-der.puesto("Grado Medio · SMR", "IES Arcipreste de Hita", "2021 — 2023")
-der.parrafo("Sistemas Microinformáticos y Redes. Guadalajara.",
-            tam=8.3, alto=10.2, col=GRIS)
-
-der.seccion("Competencias técnicas")
-der.bloque("Desarrollo móvil", "Kotlin · Jetpack Compose · Flutter · Dart · Material Design")
-der.bloque("Desarrollo web", "React · TypeScript · JavaScript · Vite · Tailwind CSS · HTML y CSS")
-der.bloque("Datos y persistencia", "SQLite · SQLCipher · Room · DataStore · IndexedDB · Firebase")
-der.bloque("Herramientas", "Git y GitHub · Android Studio · Vercel · PWA · Notificaciones locales")
-der.bloque("Sistemas", "Diagnóstico y reparación de equipos · Instalación y configuración de sistemas operativos · Redes")
-
-der.seccion("Habilidades")
-der.parrafo(
-    "Diagnóstico y resolución de problemas · Asertividad · Dinamismo · Proactividad · "
-    "Trabajo en equipo",
-    tam=8.5, alto=10.5, col=GRIS,
+col.puesto("Mozo de almacén", "Cofares (mayo — julio 2024) · Suman Social (días sueltos, 2025)",
+           "2024 — 2025")
+col.vineta(
+    "Verificación de pedidos con pistola, control de inventario, verificación de "
+    "dispositivos y paletización."
 )
 
-der.seccion("Idiomas")
-der.parrafo("Español (nativo) · Inglés (avanzado)", tam=8.5, alto=10.5, col=GRIS)
-
-der.seccion("Carnets en vigor")
+col.seccion("Proyectos")
+col.parrafo(
+    "Aplicaciones Android (Kotlin), Flutter y web (React) desarrolladas por cuenta propia. "
+    "Cada una con demo interactiva, descripción técnica y código fuente en mi portfolio:",
+    col=GRIS,
+)
+col.y -= 0.8 * mm
 c.setFillColorRGB(*TINTA)
-c.setFont("Montserrat-SemiBold", 8.7)
-c.drawString(der.x, der.y, "Carretillero")
-c.setFillColorRGB(*SUAVE)
-c.setFont("Lato-Regular", 7)
-c.drawRightString(der.x + der.ancho, der.y, "27/01/2024 — 27/01/2029")
-der.y -= 3.4 * mm
-der.parrafo(
-    "Carretilla frontal contrapesada · Traspaleta eléctrica · Apiladora eléctrica · "
-    "Carretilla retráctil · Recogepedidos",
-    tam=8.3, alto=10.2, col=GRIS,
-)
+c.setFont("Montserrat-SemiBold", 9.4)
+c.drawString(col.x, col.y, texto_portfolio)
+enlace(PORTFOLIO, col.x, col.y, texto_portfolio, "Montserrat-SemiBold", 9.4)
+col.y -= 4.2 * mm
+
+col.seccion("Formación")
+col.puesto("Técnico Superior en Desarrollo de Aplicaciones Multiplataforma (DAM)",
+           "IES Brianda de Mendoza · Guadalajara", "2024 — 2026")
+col.y -= 1.4 * mm
+col.puesto("Técnico en Sistemas Microinformáticos y Redes (SMR)",
+           "IES Arcipreste de Hita · Guadalajara", "2021 — 2023")
+
+# Idiomas, habilidades y carnet en tres columnas, para cerrar la página
+col.y -= 0.6 * mm
+fin_y = col.y
+ancho3 = (ANCHO_UTIL - 2 * 7 * mm) / 3
+bloques = [
+    ("Idiomas", "Español (nativo) · Inglés (avanzado)"),
+    ("Habilidades", "Resolución de problemas · Proactividad · Trabajo en equipo · "
+                    "Asertividad · Dinamismo"),
+    ("Carnet de carretillero", "En vigor hasta el 27/01/2029"),
+]
+minimo = fin_y
+for i, (titulo, texto) in enumerate(bloques):
+    b = Columna(MARGEN + i * (ancho3 + 7 * mm), ancho3, fin_y)
+    b.seccion(titulo)
+    b.parrafo(texto, tam=8.7, alto=11, col=GRIS)
+    minimo = min(minimo, b.y)
+col.y = minimo
 
 c.save()
 
@@ -291,8 +302,6 @@ c.save()
 from pypdf import PdfReader
 
 n = len(PdfReader(SALIDA).pages)
-sobra_izq = round(izq.y / mm, 1)
-sobra_der = round(der.y / mm, 1)
-print(f"PDF generado: {SALIDA}")
+print(f"PDF generado: {os.path.normpath(SALIDA)}")
 print(f"páginas: {n}  ({'CORRECTO' if n == 1 else 'ERROR: debe ser 1'})")
-print(f"margen inferior restante — izquierda: {sobra_izq} mm · derecha: {sobra_der} mm")
+print(f"margen inferior restante: {round(col.y / mm, 1)} mm")
