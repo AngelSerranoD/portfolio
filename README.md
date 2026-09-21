@@ -8,13 +8,13 @@ marco de móvil.
 El diseño es deliberadamente monocromo y sin iconografía: solo tipografía,
 espacio y reglas horizontales.
 
-🔗 **En producción:** _(pendiente de fijar la URL definitiva)_
+🔗 **En producción:** [aserrano.dev](https://aserrano.dev)
 
-> **Al desplegar con el dominio final**, sustituye la URL en dos sitios:
-> `index.html` (etiquetas `og:url`, `og:image`, `twitter:image` y `canonical`)
-> y `SITE_URL` en `src/data/profile.js`. Los rastreadores de LinkedIn y
-> WhatsApp no resuelven rutas relativas, así que sin eso la tarjeta de
-> previsualización sale vacía.
+> **La URL del sitio vive solo en `SITE_URL`** (`src/data/profile.js`). Vite la
+> inyecta al compilar en las etiquetas `og:url`, `og:image`, `twitter:image` y
+> `canonical` de `index.html`. Va con `www` porque es el dominio principal en
+> Vercel. La dirección antigua de `vercel.app` redirige al dominio nuevo
+> (`vercel.json`).
 
 ---
 
