@@ -190,7 +190,7 @@ def linea_contacto(y, piezas):
             x += pdfmetrics.stringWidth(texto, "Lato-Regular", 8.4)
 
 
-linea_contacto(y, [("Guadalajara, España", None),
+linea_contacto(y, [("Barcelona, España", None),
                    ("601 42 31 29", "tel:+34601423129"),
                    ("angelsd7704@gmail.com", "mailto:angelsd7704@gmail.com")])
 y -= 4.6 * mm

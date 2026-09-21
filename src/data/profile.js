@@ -5,7 +5,7 @@
 export const AUTHOR = 'Ángel Serrano Domínguez';
 export const EMAIL = 'angelsd7704@gmail.com';
 export const ROLE = 'Desarrollador de aplicaciones multiplataforma';
-export const LOCATION = 'Guadalajara, España';
+export const LOCATION = 'Barcelona, España';
 
 export const GITHUB_USER = 'AngelSerranoD';
 export const LINKEDIN =
