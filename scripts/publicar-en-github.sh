@@ -15,9 +15,9 @@ PORTFOLIO="/c/dev/portfolio"
 # Repositorios a publicar: "ruta local|nombre en GitHub|descripción"
 REPOS=(
   "/c/dev/nervio-vago|nervio-vago|Rutina diaria de estimulación del nervio vago. Flutter, offline."
-  "/c/sangria|sangria|Calendario menstrual con control de píldora y estadísticas. React PWA."
-  "/c/Users/angel/AndroidStudioProjects/WeightTracker|WeightTracker|Seguimiento de peso y evolución física. Android, Jetpack Compose."
-  "/c/Users/angel/AndroidStudioProjects/SaludDiaria|SaludDiaria|Rutina terapéutica para escoliosis y desrealización. Android, Jetpack Compose."
+  "/c/dev/sangria|sangria|Calendario menstrual con control de píldora y estadísticas. React PWA."
+  "/c/dev/weighttracker|WeightTracker|Seguimiento de peso y evolución física. Android, Jetpack Compose."
+  "/c/dev/salud-diaria|SaludDiaria|Rutina terapéutica para escoliosis y desrealización. Android, Jetpack Compose."
   "$PORTFOLIO|portfolio|Portfolio de proyectos con demos interactivas. React + Vite."
 )
 
