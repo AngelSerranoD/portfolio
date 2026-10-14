@@ -1,6 +1,9 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "redirects": [
+    { "source": "/demo/litematica3d", "destination": "/demo/schematic-lab", "permanent": true },
+    { "source": "/proyecto/litematica3d", "destination": "/proyecto/schematic-lab", "permanent": true },
+    { "source": "/privacidad/litematica3d", "destination": "/privacidad/schematic-lab", "permanent": true },
     {
       "source": "/:ruta*",
       "has": [{ "type": "host", "value": "portfolio-bay-alpha-63.vercel.app" }],

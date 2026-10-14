@@ -1,7 +1,7 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import { SITE_URL } from './src/data/profile.js';
-import { sustitutosTauri } from './src/demos/litematica3d/demo/aislamiento.js';
+import { sustitutosTauri } from './src/demos/schematic-lab/demo/aislamiento.js';
 
 /**
  * Sustituye `%SITE_URL%` en index.html por la URL de `src/data/profile.js`.
@@ -20,11 +20,11 @@ function urlDelSitio() {
 }
 
 export default defineConfig({
-  // sustitutosTauri: solo afecta a los archivos de src/demos/litematica3d/.
+  // sustitutosTauri: solo afecta a los archivos de src/demos/schematic-lab/.
   plugins: [sustitutosTauri(), react(), urlDelSitio()],
   build: {
     // Three.js (~750 kB minificado) va en su propio trozo y solo lo pide la
-    // demo de Litematica3D al abrir un schematic; no se puede partir más. Se
+    // demo de Schematic Lab al abrir un schematic; no se puede partir más. Se
     // sube el aviso para que salte solo si algo crece por encima de eso.
     chunkSizeWarningLimit: 800,
   },

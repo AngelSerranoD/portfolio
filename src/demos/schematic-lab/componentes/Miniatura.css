@@ -1,0 +1,28 @@
+/*
+ * Schematic Lab — © 2026 Ángel Serrano Domínguez. Todos los derechos reservados.
+ * Ver LICENSE y NOTICE.
+ */
+
+/* Tres caras con relleno liso: luz cenital, la izquierda en su tono y la
+   derecha en penumbra. No son degradados: cada cara es un solo color. El
+   blanco y el negro solo aclaran u oscurecen el tono de la paleta. */
+.miniatura {
+  --bloque-superior: color-mix(in oklab, var(--bloque-base) 70%, #fff);
+  --bloque-frontal: var(--bloque-base);
+  --bloque-lateral: color-mix(in oklab, var(--bloque-base) 74%, #000);
+  --bloque-arista: color-mix(in oklab, var(--bloque-base) 40%, var(--paleta-tierra));
+}
+
+/* Render isométrico guardado: PNG de fondo transparente que se encaja entero
+   en el hueco del marcador, sin marco ni sombra. */
+.miniatura-imagen {
+  display: block;
+  width: 100%;
+  height: 100%;
+  /* En el visor el hueco es una celda de grid: sin esto, su tamaño mínimo
+     automático sería el de la imagen y se saldría del marco. */
+  min-width: 0;
+  min-height: 0;
+  object-fit: contain;
+  user-select: none;
+}
