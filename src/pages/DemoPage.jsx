@@ -5,6 +5,7 @@
 import { Suspense, useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import PhoneFrame from '../components/PhoneFrame';
+import WindowFrame from '../components/WindowFrame';
 import NotFound from './NotFound';
 import { getProject } from '../data/projects';
 import { getDemo } from '../demos';
@@ -23,6 +24,10 @@ export default function DemoPage() {
   }, [project]);
 
   if (!project || !Demo) return <NotFound />;
+
+  /* Las apps de escritorio van en una ventana; el resto, en un móvil. */
+  const escritorio = project.demoFrame === 'escritorio';
+  const Marco = escritorio ? WindowFrame : PhoneFrame;
 
   return (
     <div className="flex min-h-screen flex-col bg-paper">
@@ -45,8 +50,12 @@ export default function DemoPage() {
         </div>
       </header>
 
-      <main className="flex flex-1 flex-col items-center justify-center gap-7 px-4 py-10">
-        <PhoneFrame>
+      <main
+        className={`flex flex-1 flex-col items-center justify-center gap-7 px-4 py-10 ${
+          escritorio ? 'mx-auto w-full max-w-[1312px]' : ''
+        }`}
+      >
+        <Marco>
           <Suspense
             fallback={
               <div className="flex h-full items-center justify-center bg-stone">
@@ -56,7 +65,7 @@ export default function DemoPage() {
           >
             <Demo key={runId} />
           </Suspense>
-        </PhoneFrame>
+        </Marco>
 
         {project.demoNote && (
           <p className="max-w-md text-center text-xs leading-relaxed text-clay">
