@@ -57,5 +57,11 @@ export default {
   demoFrame: 'escritorio',
   demoNote:
     'Es el frontend real de la app de escritorio; lo que haría su núcleo de Rust lo responde aquí una copia simulada en memoria. No hay texturas de Minecraft: cada bloque va con su color medio, como la app recién instalada sin el juego. Se puede girar el modelo, inspeccionar bloques y ver los materiales. En Modificar los cambios se quedan en pendientes, pero «Aplicar» no guarda nada: tampoco se importa ni se exporta ningún archivo.',
+  downloads: [
+    {
+      label: 'Descargar para Windows',
+      href: 'https://github.com/AngelSerranoD/schematic-lab/releases/download/v0.1.0/SchematicLab_0.1.0_x64-setup.exe',
+    },
+  ],
   repo: 'https://github.com/AngelSerranoD/schematic-lab',
 };
