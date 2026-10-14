@@ -11,7 +11,7 @@ export default {
   category: 'Herramientas',
   platform: 'Windows · Tauri 2 (Rust + React)',
   description:
-    'Una aplicación de escritorio para quien colecciona construcciones de Minecraft. Importa schematics de cuatro formatos (`.litematic`, `.schem`, `.schematic` y `.nbt`), los guarda en una biblioteca local y los enseña en un visor 3D. Calcula los materiales necesarios en tres modos —exacto, en stacks y en shulkers— y permite hacer cambios puntuales o reemplazar familias enteras de bloques, con un historial para deshacer. Funciona sin conexión: el núcleo, escrito en Rust, lee los archivos, genera la malla y lleva la biblioteca; React solo pinta.',
+    'Una aplicación de escritorio para quien colecciona construcciones de Minecraft. Importa schematics de cuatro formatos (.litematic, .schem, .schematic y .nbt), los guarda en una biblioteca local y los enseña en un visor 3D. Calcula los materiales necesarios en tres modos —exacto, en stacks y en shulkers— y permite hacer cambios puntuales o reemplazar familias enteras de bloques, con un historial para deshacer. Funciona sin conexión: el núcleo, escrito en Rust, lee los archivos, genera la malla y lleva la biblioteca; React solo pinta.',
   features: [
     'Importar schematics de cuatro formatos, detectados por su contenido y no por la extensión',
     'Biblioteca local con miniaturas; eliminar manda los archivos a la Papelera de Windows',
