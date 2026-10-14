@@ -10,7 +10,7 @@
 
 set -euo pipefail
 
-ORIGEN="/c/dev/litematica3d"
+ORIGEN="/c/dev/schematic-lab"
 DEMO="/c/dev/portfolio/src/demos/schematic-lab"
 PARTES=(App.tsx App.css index.css api assets componentes estado estilos logica vistas)
 
