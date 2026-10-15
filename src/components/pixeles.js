@@ -12,6 +12,11 @@
  * cada píxel cae despacio mientras se desvanece. Al salir, la página vuelve:
  * los píxeles regresan empezando por la izquierda.
  *
+ * Para que varias tarjetas puedan animarse a la vez sin tirones, los píxeles
+ * que están en su sitio no se dibujan uno a uno en cada fotograma: viven en
+ * un lienzo de fondo (`base`) que solo se toca cuando un píxel se va o
+ * vuelve. Cada fotograma es ese fondo de una vez más los píxeles en vuelo.
+ *
  * Las coordenadas de la animación van en px CSS; las de las celdas, en px
  * del dispositivo y redondeadas, para que entre vecinos no quede costura.
  */
@@ -47,6 +52,7 @@ export default class CapaDePixeles {
     this.canvas = canvas;
     this.ctx = canvas.getContext('2d');
     this.portada = document.createElement('canvas');
+    this.base = document.createElement('canvas');
     this.pintarPortada = pintarPortada;
     this.celdas = [];
     this.ancho = 0;
@@ -66,8 +72,8 @@ export default class CapaDePixeles {
     if (this.celdas.length && W === this.canvas.width && H === this.canvas.height) return;
 
     Object.assign(this, { ancho, alto, dpr });
-    this.canvas.width = this.portada.width = W;
-    this.canvas.height = this.portada.height = H;
+    this.canvas.width = this.portada.width = this.base.width = W;
+    this.canvas.height = this.portada.height = this.base.height = H;
 
     const cols = Math.max(1, Math.round(ancho / LADO));
     const filas = Math.max(1, Math.round(alto / LADO));
@@ -88,6 +94,7 @@ export default class CapaDePixeles {
           giroFinal: (Math.sin(c * 12.9898 + f * 78.233) * 0.5) * 0.9,
           desfase: (Math.sin(c * 39.346 + f * 11.135) * 0.5 + 0.5) * 0.08,
           estado: QUIETO,
+          enBase: true, // está pintado en `base` (en su sitio y entero)
           ...QUIETA,
           t: 0,
           desde: QUIETA,
@@ -103,7 +110,25 @@ export default class CapaDePixeles {
     ctx.setTransform(1, 0, 0, 1, 0, 0);
     ctx.clearRect(0, 0, this.portada.width, this.portada.height);
     this.pintarPortada(ctx, this);
+    this.rehacerBase();
     this.dibujar();
+  }
+
+  rehacerBase() {
+    const ctx = this.base.getContext('2d');
+    ctx.clearRect(0, 0, this.base.width, this.base.height);
+    ctx.drawImage(this.portada, 0, 0);
+    for (const c of this.celdas) if (!c.enBase) ctx.clearRect(c.x, c.y, c.w, c.h);
+  }
+
+  quitarDeBase(c) {
+    c.enBase = false;
+    this.base.getContext('2d').clearRect(c.x, c.y, c.w, c.h);
+  }
+
+  ponerEnBase(c) {
+    Object.assign(c, QUIETA, { estado: QUIETO, enBase: true });
+    this.base.getContext('2d').drawImage(this.portada, c.x, c.y, c.w, c.h, c.x, c.y, c.w, c.h);
   }
 
   /** Al entrar el puntero: la página se pasa de derecha a izquierda. */
@@ -123,7 +148,8 @@ export default class CapaDePixeles {
     for (const c of this.celdas) {
       if (c.estado === QUIETO || c.estado === VUELVE) continue;
       if (c.estado === ESPERA) {
-        Object.assign(c, QUIETA, { estado: QUIETO });
+        if (c.enBase) c.estado = QUIETO;
+        else this.ponerEnBase(c);
         continue;
       }
       const frente = c.u * (1 - INCLINACION) + c.v * INCLINACION;
@@ -164,7 +190,10 @@ export default class CapaDePixeles {
       if (c.estado === ESPERA) {
         vivos = true;
         c.t += dt;
-        if (c.t >= 0) c.estado = CAE;
+        if (c.t >= 0) {
+          c.estado = CAE;
+          if (c.enBase) this.quitarDeBase(c);
+        }
       } else if (c.estado === CAE) {
         vivos = true;
         c.t += dt;
@@ -187,7 +216,7 @@ export default class CapaDePixeles {
         c.dy = c.desde.dy * (1 - e);
         c.giro = c.desde.giro * (1 - e);
         c.alfa = c.desde.alfa + (1 - c.desde.alfa) * e;
-        if (k === 1) Object.assign(c, QUIETA, { estado: QUIETO });
+        if (k === 1) this.ponerEnBase(c);
       }
     }
 
@@ -200,24 +229,15 @@ export default class CapaDePixeles {
     ctx.setTransform(1, 0, 0, 1, 0, 0);
     ctx.globalAlpha = 1;
     ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    ctx.drawImage(this.base, 0, 0);
 
-    const enSuSitio = (c) =>
-      c.estado === QUIETO || (c.estado === ESPERA && c.alfa === 1 && !c.dx && !c.dy);
-    if (this.celdas.every(enSuSitio)) {
-      ctx.drawImage(portada, 0, 0);
-      return;
-    }
-
-    const moviles = [];
+    /* Los que están en vuelo, encima. Giro y traslación en una sola matriz. */
     for (const c of this.celdas) {
-      if (enSuSitio(c)) ctx.drawImage(portada, c.x, c.y, c.w, c.h, c.x, c.y, c.w, c.h);
-      else if (c.alfa > 0.01) moviles.push(c);
-    }
-    /* Los que se mueven, encima de los quietos. */
-    for (const c of moviles) {
+      if (c.enBase || c.alfa <= 0.01) continue;
+      const cos = Math.cos(c.giro);
+      const sin = Math.sin(c.giro);
       ctx.globalAlpha = c.alfa;
-      ctx.setTransform(1, 0, 0, 1, c.x + c.w / 2 + c.dx * dpr, c.y + c.h / 2 + c.dy * dpr);
-      ctx.rotate(c.giro);
+      ctx.setTransform(cos, sin, -sin, cos, c.x + c.w / 2 + c.dx * dpr, c.y + c.h / 2 + c.dy * dpr);
       ctx.drawImage(portada, c.x, c.y, c.w, c.h, -c.w / 2, -c.h / 2, c.w, c.h);
     }
     ctx.globalAlpha = 1;

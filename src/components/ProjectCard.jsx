@@ -11,7 +11,7 @@
  * En pantallas táctiles no hay hover: la portada se queda entera y un toque
  * abre la demo directamente.
  */
-import { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { startTransition, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import CapaDePixeles from './pixeles';
 import MiniDemo from './MiniDemo';
@@ -25,6 +25,16 @@ const FUENTE = 'Ranade, system-ui, sans-serif';
 
 /** Tiempo que se deja montada la demo tras salir, lo que tardan en volver los píxeles. */
 const APAGADO_MS = 1500;
+
+/**
+ * Montar una demo es lo caro (es la app entera), así que solo se monta si el
+ * puntero se queda este rato encima: al cruzar el grid de pasada, los
+ * píxeles caen pero no se monta nada.
+ */
+const INTENCION_MS = 160;
+
+/** Cómo apagar la demo que esté montada: nunca hay más de una a la vez. */
+let apagarLaMontada = null;
 
 /** Parte `texto` en líneas que quepan en `ancho` con la fuente actual del ctx. */
 function partir(ctx, texto, ancho) {
@@ -85,6 +95,7 @@ export default function ProjectCard({ project, index }) {
   const lienzo = useRef(null);
   const capa = useRef(null);
   const apagado = useRef(0);
+  const encendido = useRef(0);
   /* `encendida`: la demo está montada. `abierta`: el puntero está encima. */
   const [encendida, setEncendida] = useState(false);
   const [abierta, setAbierta] = useState(false);
@@ -117,20 +128,43 @@ export default function ProjectCard({ project, index }) {
     };
   }, [project, index]);
 
-  useEffect(() => () => clearTimeout(apagado.current), []);
+  /* Estable entre renders: es la identidad con la que se guarda en `apagarLaMontada`. */
+  const [apagar] = useState(() => () => {
+    clearTimeout(apagado.current);
+    setEncendida(false);
+  });
+
+  useEffect(
+    () => () => {
+      clearTimeout(apagado.current);
+      clearTimeout(encendido.current);
+      if (apagarLaMontada === apagar) apagarLaMontada = null;
+    },
+    [apagar]
+  );
 
   const entrar = () => {
     clearTimeout(apagado.current);
-    setEncendida(true);
+    clearTimeout(encendido.current);
     setAbierta(true);
     capa.current?.desmoronar();
+    encendido.current = setTimeout(() => {
+      if (apagarLaMontada && apagarLaMontada !== apagar) apagarLaMontada();
+      apagarLaMontada = apagar;
+      /* En transición: React puede trocear el montaje y no frena los píxeles. */
+      startTransition(() => setEncendida(true));
+    }, INTENCION_MS);
   };
 
   const salir = () => {
+    clearTimeout(encendido.current);
     setAbierta(false);
     capa.current?.recomponer();
     clearTimeout(apagado.current);
-    apagado.current = setTimeout(() => setEncendida(false), APAGADO_MS);
+    apagado.current = setTimeout(() => {
+      apagar();
+      if (apagarLaMontada === apagar) apagarLaMontada = null;
+    }, APAGADO_MS);
   };
 
   const conRaton = (e) => e.pointerType !== 'touch';
@@ -160,7 +194,7 @@ export default function ProjectCard({ project, index }) {
 
           {/* Aparece cuando la página ya va por la mitad; al salir, se va sin esperar. */}
           <span
-            className={`pointer-events-none absolute bottom-5 left-1/2 -translate-x-1/2 rounded-full bg-ink/90 px-5 py-2.5 text-xs font-medium text-paper shadow-[0_10px_30px_-10px_rgba(0,0,0,0.6)] backdrop-blur-sm transition-[opacity,transform,filter] ${
+            className={`pointer-events-none absolute bottom-5 left-1/2 -translate-x-1/2 rounded-full bg-ink/90 px-5 py-2.5 text-xs font-medium text-paper shadow-[0_10px_30px_-10px_rgba(0,0,0,0.6)] transition-[opacity,transform,filter] ${
               abierta
                 ? 'translate-y-0 opacity-100 blur-0 delay-700 duration-700 ease-out'
                 : 'translate-y-3 opacity-0 blur-[2px] delay-0 duration-300 ease-in'
