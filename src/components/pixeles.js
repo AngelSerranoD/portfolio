@@ -10,7 +10,8 @@
  * La caída es como pasar la página de un libro: un frente que barre de
  * derecha a izquierda, algo inclinado (la esquina de abajo va primero), y
  * cada píxel cae despacio mientras se desvanece. Al salir, la página vuelve:
- * los píxeles regresan empezando por la izquierda.
+ * los píxeles regresan de izquierda a derecha. Cada tarjeta va por su cuenta
+ * y el barrido arranca al momento, esté la página abierta entera o a medias.
  *
  * Cada tarjeta corre en un Web Worker (pixeles.worker.js) con su canvas
  * transferido: el hilo principal puede estar ocupado montando una demo y
@@ -40,6 +41,11 @@ const FUERA = 3;
 const VUELVE = 4;
 
 const QUIETA = { dx: 0, dy: 0, giro: 0, alfa: 1 };
+
+/** Cuándo le llega el frente a cada píxel (0-1): a la ida, desde la esquina de abajo a la derecha. */
+const frenteIda = (c) => (1 - c.u) * (1 - INCLINACION) + (1 - c.v) * INCLINACION;
+/** Y a la vuelta, desde la de arriba a la izquierda. */
+const frenteVuelta = (c) => c.u * (1 - INCLINACION) + c.v * INCLINACION;
 
 /** Suave al empezar y al acabar. */
 const suave = (k) => k * k * (3 - 2 * k);
@@ -145,31 +151,47 @@ export default class CapaDePixeles {
     this.base.getContext('2d').drawImage(this.portada, c.x, c.y, c.w, c.h, c.x, c.y, c.w, c.h);
   }
 
-  /** Al entrar el puntero: la página se pasa de derecha a izquierda. */
+  /**
+   * Al entrar el puntero: la página se pasa de derecha a izquierda. El
+   * barrido arranca en el primer píxel que está en su sitio, sin esperas, y
+   * los que aún andaban volviendo de la vez anterior caen otra vez ya.
+   */
   desmoronar() {
+    let primero = Infinity;
+    for (const c of this.celdas) if (c.estado === QUIETO) primero = Math.min(primero, frenteIda(c));
     for (const c of this.celdas) {
-      if (c.estado === CAE || c.estado === FUERA || c.estado === ESPERA) continue;
-      const frente = (1 - c.u) * (1 - INCLINACION) + (1 - c.v) * INCLINACION;
-      c.desde = this.ahora(c);
-      c.estado = ESPERA;
-      c.t = -(frente * BARRIDO + c.desfase);
+      if (c.estado === QUIETO) {
+        c.desde = QUIETA;
+        c.estado = ESPERA;
+        c.t = -((frenteIda(c) - primero) * BARRIDO + c.desfase);
+      } else if (c.estado === VUELVE) {
+        c.desde = this.ahora(c);
+        c.estado = CAE;
+        c.t = 0;
+      }
     }
     this.arrancar();
   }
 
-  /** Al salir: la página vuelve, empezando por la izquierda. */
+  /**
+   * Al salir: la página vuelve de izquierda a derecha, empezando en el
+   * primer píxel caído. Si solo se abrió un trozo, ese trozo vuelve ya, no
+   * cuando le llegaría el turno barriendo la portada entera.
+   */
   recomponer() {
+    let primero = Infinity;
     for (const c of this.celdas) {
-      if (c.estado === QUIETO || c.estado === VUELVE) continue;
+      if (c.estado === CAE || c.estado === FUERA) primero = Math.min(primero, frenteVuelta(c));
+    }
+    for (const c of this.celdas) {
       if (c.estado === ESPERA) {
         if (c.enBase) c.estado = QUIETO;
         else this.ponerEnBase(c);
-        continue;
+      } else if (c.estado === CAE || c.estado === FUERA) {
+        c.desde = this.ahora(c);
+        c.estado = VUELVE;
+        c.t = -((frenteVuelta(c) - primero) * VUELTA_BARRIDO + c.desfase);
       }
-      const frente = c.u * (1 - INCLINACION) + c.v * INCLINACION;
-      c.desde = this.ahora(c);
-      c.estado = VUELVE;
-      c.t = -(frente * VUELTA_BARRIDO + c.desfase);
     }
     this.arrancar();
   }

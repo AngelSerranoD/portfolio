@@ -29,12 +29,10 @@ const APAGADO_MS = 1500;
 /**
  * Montar una demo es lo caro (es la app entera), así que solo se monta si el
  * puntero se queda este rato encima: al cruzar el grid de pasada, los
- * píxeles caen pero no se monta nada.
+ * píxeles caen pero no se monta nada. Cada tarjeta desmonta la suya cuando
+ * acaba de cerrarse, sin depender de lo que hagan las demás.
  */
 const INTENCION_MS = 160;
-
-/** Cómo apagar la demo que esté montada: nunca hay más de una a la vez. */
-let apagarLaMontada = null;
 
 /** Parte `texto` en líneas que quepan en `ancho` con la fuente actual del ctx. */
 function partir(ctx, texto, ancho) {
@@ -128,19 +126,12 @@ export default function ProjectCard({ project, index }) {
     };
   }, [project, index]);
 
-  /* Estable entre renders: es la identidad con la que se guarda en `apagarLaMontada`. */
-  const [apagar] = useState(() => () => {
-    clearTimeout(apagado.current);
-    setEncendida(false);
-  });
-
   useEffect(
     () => () => {
       clearTimeout(apagado.current);
       clearTimeout(encendido.current);
-      if (apagarLaMontada === apagar) apagarLaMontada = null;
     },
-    [apagar]
+    []
   );
 
   const entrar = () => {
@@ -149,8 +140,6 @@ export default function ProjectCard({ project, index }) {
     setAbierta(true);
     capa.current?.desmoronar();
     encendido.current = setTimeout(() => {
-      if (apagarLaMontada && apagarLaMontada !== apagar) apagarLaMontada();
-      apagarLaMontada = apagar;
       /* En transición: React puede trocear el montaje y no frena los píxeles. */
       startTransition(() => setEncendida(true));
     }, INTENCION_MS);
@@ -161,10 +150,7 @@ export default function ProjectCard({ project, index }) {
     setAbierta(false);
     capa.current?.recomponer();
     clearTimeout(apagado.current);
-    apagado.current = setTimeout(() => {
-      apagar();
-      if (apagarLaMontada === apagar) apagarLaMontada = null;
-    }, APAGADO_MS);
+    apagado.current = setTimeout(() => setEncendida(false), APAGADO_MS);
   };
 
   const conRaton = (e) => e.pointerType !== 'touch';
