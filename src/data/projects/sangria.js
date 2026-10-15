@@ -3,7 +3,7 @@
  * Copyright (c) 2026 Ángel Serrano Domínguez. Todos los derechos reservados.
  */
 export default {
-  "order": 20,
+  "order": 90,
   "slug": "sangria",
   "name": "Sangría",
   "tagline": "Calendario menstrual con recordatorio de píldora y estadísticas",

@@ -3,7 +3,7 @@
  * Copyright (c) 2026 Ángel Serrano Domínguez. Todos los derechos reservados.
  */
 export default {
-  "order": 40,
+  "order": 70,
   "slug": "salud-diaria",
   "name": "SaludDiaria",
   "tagline": "Rutina terapéutica diaria para escoliosis y desrealización",

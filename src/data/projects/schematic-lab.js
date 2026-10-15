@@ -3,7 +3,7 @@
  * Copyright (c) 2026 Ángel Serrano Domínguez. Todos los derechos reservados.
  */
 export default {
-  order: 130,
+  order: 10,
   slug: 'schematic-lab',
   name: 'Schematic Lab',
   tagline: 'Un visor y editor de schematics de Minecraft: los abres, los miras en 3D y sabes qué materiales hacen falta',

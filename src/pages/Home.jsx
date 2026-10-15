@@ -4,7 +4,7 @@
 import { useEffect } from 'react';
 import Nav from '../components/Nav';
 import Footer from '../components/Footer';
-import ProjectRow from '../components/ProjectRow';
+import ProjectCard from '../components/ProjectCard';
 import { projects } from '../data/projects';
 import {
   AUTHOR,
@@ -62,7 +62,7 @@ export default function Home() {
         <h1 className="mt-7 max-w-3xl animate-fade-up font-display text-5xl font-bold leading-[1.04] tracking-tightest sm:text-7xl">
           Aplicaciones que
           <br />
-          <span className="text-clay">llegan a producción.</span>
+          llegan a producción.
         </h1>
 
         <p className="mt-9 max-w-lg animate-fade-up text-base leading-relaxed text-slate">
@@ -88,9 +88,9 @@ export default function Home() {
           </span>
         </div>
 
-        <div className="mt-8 border-b border-stone">
+        <div className="mt-8 grid grid-flow-row-dense gap-x-6 gap-y-12 sm:grid-cols-2 lg:grid-cols-3">
           {projects.map((project, i) => (
-            <ProjectRow key={project.slug} project={project} index={i} />
+            <ProjectCard key={project.slug} project={project} index={i} />
           ))}
         </div>
       </section>

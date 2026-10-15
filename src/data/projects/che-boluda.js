@@ -3,7 +3,7 @@
  * Copyright (c) 2026 Ángel Serrano Domínguez. Todos los derechos reservados.
  */
 export default {
-  order: 100,
+  order: 30,
   slug: 'che-boluda',
   name: 'Ché boluda',
   tagline: 'Un walkie-talkie en el iPhone: mantienes pulsado, hablas y tus amigas te oyen al momento',

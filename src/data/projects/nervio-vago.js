@@ -3,7 +3,7 @@
  * Copyright (c) 2026 Ángel Serrano Domínguez. Todos los derechos reservados.
  */
 export default {
-  "order": 10,
+  "order": 100,
   "slug": "nervio-vago",
   "name": "Nervio Vago",
   "tagline": "Rutina diaria de estimulación vagal con rachas y recordatorios",

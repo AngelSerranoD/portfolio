@@ -3,7 +3,7 @@
  * Copyright (c) 2026 Ángel Serrano Domínguez. Todos los derechos reservados.
  */
 export default {
-  order: 80,
+  order: 110,
   slug: 'sehati',
   name: 'Sehati',
   tagline: 'Seguimiento de una dieta pautada, en español y árabe',

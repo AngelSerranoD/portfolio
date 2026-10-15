@@ -3,7 +3,7 @@
  * Copyright (c) 2026 Ángel Serrano Domínguez. Todos los derechos reservados.
  */
 export default {
-  order: 70,
+  order: 130,
   slug: 'rotatebooth',
   name: 'RotateBooth',
   tagline: 'Gira muchas fotos del carrete a la vez, sin salir del iPhone',

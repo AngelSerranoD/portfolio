@@ -5,7 +5,7 @@
 const RELEASE = 'https://github.com/AngelSerranoD/pocketpc/releases/download/v1.0.2';
 
 export default {
-  order: 120,
+  order: 20,
   slug: 'pocketpc',
   name: 'PocketPC',
   tagline: 'Las pantallas del PC en el móvil, desde cualquier sitio, y manejarlas con el dedo',

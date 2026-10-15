@@ -3,7 +3,7 @@
  * Copyright (c) 2026 Ángel Serrano Domínguez. Todos los derechos reservados.
  */
 export default {
-  order: 90,
+  order: 120,
   slug: 'dailyweigh',
   name: 'DailyWeigh',
   tagline: 'El peso de cada día y la media de cada semana, en la pantalla de inicio del iPhone',

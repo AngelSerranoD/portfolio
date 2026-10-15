@@ -3,7 +3,7 @@
  * Copyright (c) 2026 Ángel Serrano Domínguez. Todos los derechos reservados.
  */
 export default {
-  order: 110,
+  order: 40,
   slug: 'jib-m3ak',
   name: 'Jib M3ak',
   tagline: 'La compra de una familia, con fotos y en dos idiomas: español y darija marroquí',

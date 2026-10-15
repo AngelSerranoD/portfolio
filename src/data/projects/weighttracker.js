@@ -3,7 +3,7 @@
  * Copyright (c) 2026 Ángel Serrano Domínguez. Todos los derechos reservados.
  */
 export default {
-  "order": 30,
+  "order": 80,
   "slug": "weighttracker",
   "name": "WeightTracker",
   "tagline": "Seguimiento de peso y evolución física con comparador de fotos",
