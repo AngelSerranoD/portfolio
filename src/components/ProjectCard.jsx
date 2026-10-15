@@ -13,7 +13,7 @@
  */
 import { startTransition, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
-import CapaDePixeles from './pixeles';
+import { crearPortada } from './portadaPixeles';
 import MiniDemo from './MiniDemo';
 
 /* Colores de tailwind.config.js, que el canvas no puede leer de las clases. */
@@ -102,7 +102,7 @@ export default function ProjectCard({ project, index }) {
 
   useLayoutEffect(() => {
     const canvas = lienzo.current;
-    const nueva = new CapaDePixeles(canvas, (ctx, medidas) =>
+    const nueva = crearPortada(canvas, (ctx, medidas) =>
       pintarPortada(ctx, medidas, project, index)
     );
     capa.current = nueva;
@@ -118,7 +118,7 @@ export default function ProjectCard({ project, index }) {
     document.fonts
       ?.load(`700 32px ${FUENTE}`)
       .then(() => document.fonts.load(`500 12px ${FUENTE}`))
-      .then(() => viva && nueva.repintarPortada())
+      .then(() => viva && nueva.repintar())
       .catch(() => {});
 
     return () => {

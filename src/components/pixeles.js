@@ -12,7 +12,10 @@
  * cada píxel cae despacio mientras se desvanece. Al salir, la página vuelve:
  * los píxeles regresan empezando por la izquierda.
  *
- * Para que varias tarjetas puedan animarse a la vez sin tirones, los píxeles
+ * Cada tarjeta corre en un Web Worker (pixeles.worker.js) con su canvas
+ * transferido: el hilo principal puede estar ocupado montando una demo y
+ * los píxeles siguen cayendo igual. Además, para que varias tarjetas
+ * puedan animarse a la vez sin tirones, los píxeles
  * que están en su sitio no se dibujan uno a uno en cada fotograma: viven en
  * un lienzo de fondo (`base`) que solo se toca cuando un píxel se va o
  * vuelve. Cada fotograma es ese fondo de una vez más los píxeles en vuelo.
@@ -41,80 +44,91 @@ const QUIETA = { dx: 0, dy: 0, giro: 0, alfa: 1 };
 /** Suave al empezar y al acabar. */
 const suave = (k) => k * k * (3 - 2 * k);
 
+/* En un worker puede no haber requestAnimationFrame (Safari): se tira de un temporizador. */
+const pedirFotograma =
+  globalThis.requestAnimationFrame?.bind(globalThis) ??
+  ((cb) => setTimeout(() => cb(performance.now()), 16));
+const cancelarFotograma =
+  globalThis.cancelAnimationFrame?.bind(globalThis) ?? clearTimeout;
+
+/** Lienzo auxiliar que vale tanto en la página como dentro de un worker. */
+function lienzo(w, h) {
+  if (typeof OffscreenCanvas !== 'undefined') return new OffscreenCanvas(w, h);
+  return Object.assign(document.createElement('canvas'), { width: w, height: h });
+}
+
+/**
+ * No toca el DOM ni las fuentes: recibe la portada ya pintada (un canvas o
+ * un ImageBitmap del tamaño del lienzo), así que funciona igual en el hilo
+ * principal que en un Web Worker con un OffscreenCanvas (pixeles.worker.js).
+ */
 export default class CapaDePixeles {
   /**
-   * @param {HTMLCanvasElement} canvas
-   * @param {(ctx: CanvasRenderingContext2D, capa: CapaDePixeles) => void} pintarPortada
-   *   Pinta la portada entera en `ctx` (px del dispositivo). Recibe la capa
-   *   para conocer `dpr`, `ancho` y `alto`.
+   * @param {HTMLCanvasElement | OffscreenCanvas} canvas
+   * @param {{ reducido?: boolean }} opciones  `reducido`: prefers-reduced-motion.
    */
-  constructor(canvas, pintarPortada) {
+  constructor(canvas, { reducido = false } = {}) {
     this.canvas = canvas;
     this.ctx = canvas.getContext('2d');
-    this.portada = document.createElement('canvas');
-    this.base = document.createElement('canvas');
-    this.pintarPortada = pintarPortada;
+    this.portada = null;
+    this.base = lienzo(1, 1);
     this.celdas = [];
     this.ancho = 0;
     this.alto = 0;
     this.dpr = 1;
     this.raf = 0;
     this.ultimo = 0;
-    this.reducido =
-      window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false;
+    this.reducido = reducido;
     this.paso = this.paso.bind(this);
   }
 
-  redimensionar(ancho, alto) {
-    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+  /**
+   * Fija el tamaño (px CSS y densidad) y la portada, que mide
+   * `ancho·dpr × alto·dpr`. Solo rehace las celdas si cambia el tamaño.
+   */
+  preparar(ancho, alto, dpr, portada) {
+    if (this.portada && this.portada !== portada) this.portada.close?.();
+    this.portada = portada;
+
     const W = Math.round(ancho * dpr);
     const H = Math.round(alto * dpr);
-    if (this.celdas.length && W === this.canvas.width && H === this.canvas.height) return;
-
-    Object.assign(this, { ancho, alto, dpr });
-    this.canvas.width = this.portada.width = this.base.width = W;
-    this.canvas.height = this.portada.height = this.base.height = H;
-
-    const cols = Math.max(1, Math.round(ancho / LADO));
-    const filas = Math.max(1, Math.round(alto / LADO));
-    this.celdas = [];
-    for (let f = 0; f < filas; f++) {
-      for (let c = 0; c < cols; c++) {
-        const x = Math.round((c * W) / cols);
-        const y = Math.round((f * H) / filas);
-        const w = Math.round(((c + 1) * W) / cols) - x;
-        const h = Math.round(((f + 1) * H) / filas) - y;
-        this.celdas.push({
-          x, y, w, h,
-          /* Posición relativa (0-1) dentro de la portada. */
-          u: (c + 0.5) / cols,
-          v: (f + 0.5) / filas,
-          /* Giro propio y un pelín de desorden en el frente, para que no
-             caiga como una persiana; siempre el mismo para cada píxel. */
-          giroFinal: (Math.sin(c * 12.9898 + f * 78.233) * 0.5) * 0.9,
-          desfase: (Math.sin(c * 39.346 + f * 11.135) * 0.5 + 0.5) * 0.08,
-          estado: QUIETO,
-          enBase: true, // está pintado en `base` (en su sitio y entero)
-          ...QUIETA,
-          t: 0,
-          desde: QUIETA,
-        });
+    if (!this.celdas.length || W !== this.canvas.width || H !== this.canvas.height) {
+      Object.assign(this, { ancho, alto, dpr });
+      this.canvas.width = this.base.width = W;
+      this.canvas.height = this.base.height = H;
+      this.celdas = [];
+      const cols = Math.max(1, Math.round(ancho / LADO));
+      const filas = Math.max(1, Math.round(alto / LADO));
+      for (let f = 0; f < filas; f++) {
+        for (let c = 0; c < cols; c++) {
+          const x = Math.round((c * W) / cols);
+          const y = Math.round((f * H) / filas);
+          const w = Math.round(((c + 1) * W) / cols) - x;
+          const h = Math.round(((f + 1) * H) / filas) - y;
+          this.celdas.push({
+            x, y, w, h,
+            /* Posición relativa (0-1) dentro de la portada. */
+            u: (c + 0.5) / cols,
+            v: (f + 0.5) / filas,
+            /* Giro propio y un pelín de desorden en el frente, para que no
+               caiga como una persiana; siempre el mismo para cada píxel. */
+            giroFinal: (Math.sin(c * 12.9898 + f * 78.233) * 0.5) * 0.9,
+            desfase: (Math.sin(c * 39.346 + f * 11.135) * 0.5 + 0.5) * 0.08,
+            estado: QUIETO,
+            enBase: true, // está pintado en `base` (en su sitio y entero)
+            ...QUIETA,
+            t: 0,
+            desde: QUIETA,
+          });
+        }
       }
     }
-    this.repintarPortada();
-  }
-
-  repintarPortada() {
-    if (!this.celdas.length) return;
-    const ctx = this.portada.getContext('2d');
-    ctx.setTransform(1, 0, 0, 1, 0, 0);
-    ctx.clearRect(0, 0, this.portada.width, this.portada.height);
-    this.pintarPortada(ctx, this);
     this.rehacerBase();
     this.dibujar();
   }
 
   rehacerBase() {
+    if (!this.portada) return;
     const ctx = this.base.getContext('2d');
     ctx.clearRect(0, 0, this.base.width, this.base.height);
     ctx.drawImage(this.portada, 0, 0);
@@ -161,8 +175,10 @@ export default class CapaDePixeles {
   }
 
   destruir() {
-    cancelAnimationFrame(this.raf);
+    cancelarFotograma(this.raf);
     this.raf = 0;
+    this.portada?.close?.();
+    this.portada = null;
   }
 
   ahora(c) {
@@ -178,11 +194,13 @@ export default class CapaDePixeles {
   arrancar() {
     if (this.raf) return;
     this.ultimo = performance.now();
-    this.raf = requestAnimationFrame(this.paso);
+    this.raf = pedirFotograma(this.paso);
   }
 
   paso(ahora) {
-    const dt = Math.min(0.05, (ahora - this.ultimo) / 1000 || 0.016);
+    /* Tiempo real, sin tope: si un fotograma llega tarde, la animación salta
+       hasta donde debe estar en vez de ir a cámara lenta. */
+    const dt = Math.max(0, (ahora - this.ultimo) / 1000);
     this.ultimo = ahora;
     let vivos = false;
 
@@ -221,11 +239,12 @@ export default class CapaDePixeles {
     }
 
     this.dibujar();
-    this.raf = vivos ? requestAnimationFrame(this.paso) : 0;
+    this.raf = vivos ? pedirFotograma(this.paso) : 0;
   }
 
   dibujar() {
     const { ctx, dpr, portada } = this;
+    if (!portada) return;
     ctx.setTransform(1, 0, 0, 1, 0, 0);
     ctx.globalAlpha = 1;
     ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
