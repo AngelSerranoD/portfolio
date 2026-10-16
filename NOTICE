@@ -9,3 +9,13 @@ Primera publicación: 7 de septiembre de 2026.
 Este archivo acredita la autoría del contenido de este repositorio.
 Cualquier uso no autorizado constituye una infracción de los derechos de
 propiedad intelectual del autor. Véase el archivo LICENSE.
+
+Recursos de terceros
+--------------------
+- Texturas de bloques del taller del panorama (herramientas/panorama/texturas):
+  Voxel Pack de Kenney (www.kenney.nl), dominio público (CC0 1.0).
+- Fuente Monocraft (src/assets/fuentes): © Idrees Hassan, SIL Open Font
+  License 1.1 (texto en public/licencias/OFL-Monocraft.txt).
+
+Proyecto independiente, sin afiliación con Mojang Studios ni Microsoft. La
+estética de menú es una recreación propia; no incluye recursos del juego.
