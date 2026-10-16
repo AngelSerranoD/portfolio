@@ -35,9 +35,8 @@ const transferidos = new WeakMap(); // canvas → { id, adios }
  * @param {HTMLCanvasElement} canvas
  * @param {(ctx: CanvasRenderingContext2D, medidas: {ancho: number, alto: number, dpr: number}) => void} pintar
  *   Pinta la portada en px del dispositivo; `ctx` empieza sin transformar.
- * @param {number} [semilla]  Elige el dibujo de las grietas.
  */
-export function crearPortada(canvas, pintar, semilla = 1) {
+export function crearPortada(canvas, pintar) {
   const reducido =
     window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false;
   const papel = document.createElement('canvas');
@@ -55,7 +54,7 @@ export function crearPortada(canvas, pintar, semilla = 1) {
   };
 
   if (!conWorker) {
-    const capa = new CapaDeGrietas(canvas, { reducido, semilla });
+    const capa = new CapaDeGrietas(canvas, { reducido });
     const repintar = () => {
       if (!medidas) return;
       pintarPapel();
@@ -80,7 +79,7 @@ export function crearPortada(canvas, pintar, semilla = 1) {
     registro = { id: siguienteId++, adios: 0 };
     transferidos.set(canvas, registro);
     const offscreen = canvas.transferControlToOffscreen();
-    elWorker().postMessage({ tipo: 'crear', id: registro.id, canvas: offscreen, reducido, semilla }, [offscreen]);
+    elWorker().postMessage({ tipo: 'crear', id: registro.id, canvas: offscreen, reducido }, [offscreen]);
   }
   const { id } = registro;
   const mandar = (tipo) => elWorker().postMessage({ tipo, id });

@@ -10,12 +10,13 @@
  * llegó a romperse, las grietas se borran al instante, como cuando dejas de
  * picar; si se rompió, el bloque se vuelve a colocar con un pequeño rebote.
  *
- * Las grietas no son una textura del juego: se generan aquí, con una semilla
- * por tarjeta, como caminos que salen del centro sobre una rejilla de téxeles
- * (píxeles gordos). Cada téxel sabe en qué fase aparece, así que pintar la
- * fase n es pintar los téxeles de las fases 0…n. Ese dibujo vive en un lienzo
- * aparte (`rajas`) que solo se rehace al cambiar de fase: cada fotograma es
- * la portada más ese lienzo, o solo los trocitos en vuelo.
+ * Las grietas siguen un patrón fijo de 16 × 16 téxeles, como en el juego,
+ * pero dibujado aquí: no es su textura. La tarjeta mide un bloque de alto
+ * (16 téxeles) y el patrón se repite a lo ancho, con un bloque centrado. Cada
+ * fase añade rajas a la anterior, así que pintar la fase n es pintar las
+ * rajas de las fases 0…n. Ese dibujo vive en dos lienzos aparte (`oscuras` y
+ * `claras`) que solo se rehacen al cambiar de fase: cada fotograma es la
+ * portada más esos dos lienzos, o solo los trocitos en vuelo.
  *
  * Cada tarjeta corre en un Web Worker (grietas.worker.js) con su canvas
  * transferido: el hilo principal puede estar ocupado montando una demo y
@@ -25,12 +26,8 @@
  * del dispositivo y redondeadas, para que entre vecinos no quede costura.
  */
 
-const TEXEL = 8; //              lado de un téxel de grieta, en px CSS
 const FASES = 10; //             fases de grieta, como en el juego
 const ROTURA = 0.9; //           s desde la primera grieta hasta que se rompe
-const RAMAS = 5; //              grietas que salen del centro
-const TORCER = 0.7; //           cuánto se tuerce una grieta en cada paso (rad)
-const BIFURCAR = 0.06; //        probabilidad de que una grieta se parta en cada paso
 const PARTICULAS = 48; //        trocitos que saltan al romperse
 const LADO_PARTICULA = 10; //    px CSS de cada trocito (±30 %)
 const GRAVEDAD = 1400; //        px/s²
@@ -39,25 +36,60 @@ const VIDA_MAX = 0.85; //        …y como máximo
 const COLOCAR = 0.15; //         s del rebote al volver a colocar el bloque
 const ESCALA_COLOCAR = 0.92; //  tamaño con el que empieza ese rebote
 
-const NUCLEO = 'rgba(0, 0, 0, 0.85)'; //    la raja
-const LUZ = 'rgba(255, 255, 255, 0.16)'; // su borde de abajo, que le da relieve
+/*
+ * Patrón propio de 16 × 16 téxeles, al estilo del juego: cada carácter es la
+ * fase (0-9) en que aparece la raja de ese téxel, y «.» que no hay. Nace en
+ * el centro, avanza en escalera hacia los bordes y cada fase añade a la anterior.
+ */
+const PATRON = [
+  '...6..........8.',
+  '....5..78....7..',
+  '....4.6..9..6...',
+  '.....3....8.5...',
+  '..9..2.....4....',
+  '9..8..1...3.....',
+  '.8..761...3.....',
+  '..7....001......',
+  '..6..22.0.22....',
+  '...43...1...34..',
+  '.65....2....5.56',
+  '7......3..89.6..',
+  '.....66.48...7..',
+  '....7...5.....8.',
+  '...8.....6.....9',
+  '..9......7......',
+];
+const LADO = PATRON.length; // téxeles por lado de un bloque
+
+/*
+ * Fundido como el del juego: las rajas oscurecen lo que tienen debajo
+ * (multiply) y su luz lo aclara (screen), sea el fondo o una letra.
+ */
+const OSCURA = '#2a2a2a';
+const CLARA = '#4a4a4a';
+
+/**
+ * Téxeles del patrón por fase: las rajas y, justo debajo de cada una (si ahí
+ * no hay raja), su luz, que aparece con ella.
+ */
+const PATRON_POR_FASE = (() => {
+  const fases = Array.from({ length: FASES }, () => ({ rajas: [], luces: [] }));
+  const hay = (x, y) => y < LADO && PATRON[y][x] !== '.';
+  for (let y = 0; y < LADO; y++) {
+    for (let x = 0; x < LADO; x++) {
+      if (!hay(x, y)) continue;
+      const fase = Number(PATRON[y][x]);
+      fases[fase].rajas.push([x, y]);
+      if (y + 1 < LADO && !hay(x, y + 1)) fases[fase].luces.push([x, y + 1]);
+    }
+  }
+  return fases;
+})();
 
 const ENTERA = 0;
 const AGRIETANDO = 1;
 const ROTA = 2;
 const COLOCANDO = 3;
-
-/** Azar con semilla (mulberry32): la misma tarjeta siempre se agrieta igual. */
-function azarConSemilla(semilla) {
-  let a = semilla >>> 0;
-  return () => {
-    a = (a + 0x6d2b79f5) >>> 0;
-    let t = a;
-    t = Math.imul(t ^ (t >>> 15), t | 1);
-    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
-    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
-  };
-}
 
 /** Rápido al principio y pasándose un pelín al final: el «toc» al colocar un bloque. */
 function rebote(k) {
@@ -79,52 +111,6 @@ function lienzo(w, h) {
 }
 
 /**
- * Grietas sobre una rejilla de `cols × filas` téxeles: devuelve, para cada
- * téxel agrietado (por su índice), la fase 0-9 en que aparece; cuanto más
- * lejos del centro, más tarde. Cada rama avanza un téxel por paso y se va
- * torciendo, así que queda en escalera, como en el juego; a veces se parte.
- */
-function generarGrietas(cols, filas, azar) {
-  const fases = new Map();
-  const cx = cols / 2;
-  const cy = filas / 2;
-  const radio = Math.hypot(cx, cy);
-
-  const marcar = (x, y) => {
-    const xi = Math.floor(x);
-    const yi = Math.floor(y);
-    if (xi < 0 || yi < 0 || xi >= cols || yi >= filas) return false;
-    /* ×1,15: la última fase llega antes de la esquina, no justo en ella. */
-    const lejos = Math.hypot(xi + 0.5 - cx, yi + 0.5 - cy) / radio;
-    const fase = Math.min(FASES - 1, Math.floor(lejos * FASES * 1.15));
-    const i = yi * cols + xi;
-    const antes = fases.get(i);
-    if (antes === undefined || fase < antes) fases.set(i, fase);
-    return true;
-  };
-
-  const rama = (x, y, angulo, largo) => {
-    for (let paso = 0; paso < largo; paso++) {
-      angulo += (azar() - 0.5) * TORCER;
-      x += Math.cos(angulo);
-      y += Math.sin(angulo);
-      if (!marcar(x, y)) return;
-      if (azar() < BIFURCAR && largo - paso > 6) {
-        const lado = azar() < 0.5 ? -1 : 1;
-        rama(x, y, angulo + lado * (0.6 + azar() * 0.6), (largo - paso) * 0.5);
-      }
-    }
-  };
-
-  marcar(cx, cy);
-  for (let r = 0; r < RAMAS; r++) {
-    const angulo = (r / RAMAS) * Math.PI * 2 + (azar() - 0.5) * 0.9;
-    rama(cx, cy, angulo, radio * (0.85 + azar() * 0.3));
-  }
-  return fases;
-}
-
-/**
  * No toca el DOM ni las fuentes: recibe la portada ya pintada (un canvas o
  * un ImageBitmap del tamaño del lienzo), así que funciona igual en el hilo
  * principal que en un Web Worker con un OffscreenCanvas (grietas.worker.js).
@@ -132,33 +118,31 @@ function generarGrietas(cols, filas, azar) {
 export default class CapaDeGrietas {
   /**
    * @param {HTMLCanvasElement | OffscreenCanvas} canvas
-   * @param {{ reducido?: boolean, semilla?: number }} opciones
-   *   `reducido`: prefers-reduced-motion (sin trocitos ni rebote).
-   *   `semilla`: elige el dibujo de las grietas; cada tarjeta, el suyo.
+   * @param {{ reducido?: boolean }} opciones  `reducido`: prefers-reduced-motion (sin trocitos ni rebote).
    */
-  constructor(canvas, { reducido = false, semilla = 1 } = {}) {
+  constructor(canvas, { reducido = false } = {}) {
     this.canvas = canvas;
     this.ctx = canvas.getContext('2d');
     this.portada = null;
-    this.rajas = lienzo(1, 1); // las grietas hasta la fase actual, ya pintadas
-    this.grietas = []; //         por fase, los téxeles que aparecen en ella
+    this.oscuras = lienzo(1, 1); // las rajas hasta la fase actual, ya pintadas…
+    this.claras = lienzo(1, 1); //  …y su luz
+    this.grietas = []; //            por fase, sus rectángulos en px del dispositivo
     this.particulas = [];
     this.ancho = 0;
     this.alto = 0;
     this.dpr = 1;
     this.estado = ENTERA;
     this.t = 0;
-    this.fase = -1; // última fase pintada en `rajas` (−1: ninguna)
+    this.fase = -1; // última fase pintada en `oscuras` y `claras` (−1: ninguna)
     this.raf = 0;
     this.ultimo = 0;
     this.reducido = reducido;
-    this.semilla = semilla;
     this.paso = this.paso.bind(this);
   }
 
   /**
    * Fija el tamaño (px CSS y densidad) y la portada, que mide
-   * `ancho·dpr × alto·dpr`. Solo rehace las grietas si cambia el tamaño.
+   * `ancho·dpr × alto·dpr`. Solo recoloca el patrón si cambia el tamaño.
    */
   preparar(ancho, alto, dpr, portada) {
     if (this.portada && this.portada !== portada) this.portada.close?.();
@@ -168,46 +152,58 @@ export default class CapaDeGrietas {
     const H = Math.round(alto * dpr);
     if (!this.grietas.length || W !== this.canvas.width || H !== this.canvas.height) {
       Object.assign(this, { ancho, alto, dpr });
-      this.canvas.width = this.rajas.width = W;
-      this.canvas.height = this.rajas.height = H;
-      const cols = Math.max(1, Math.ceil(ancho / TEXEL));
-      const filas = Math.max(1, Math.ceil(alto / TEXEL));
-      const lado = TEXEL * dpr;
-      this.grietas = Array.from({ length: FASES }, () => []);
-      for (const [i, fase] of generarGrietas(cols, filas, azarConSemilla(this.semilla))) {
-        const xi = i % cols;
-        const yi = Math.floor(i / cols);
-        const x = Math.round(xi * lado);
-        const y = Math.round(yi * lado);
-        this.grietas[fase].push({
+      this.canvas.width = this.oscuras.width = this.claras.width = W;
+      this.canvas.height = this.oscuras.height = this.claras.height = H;
+
+      /* La tarjeta mide un bloque de alto; a lo ancho, un bloque centrado y
+         el patrón repetido a los lados hasta cubrirla. */
+      const texel = alto / LADO; // px CSS
+      const bloque = texel * LADO;
+      const x0 = ancho / 2 - bloque / 2;
+      const desde = Math.floor(-x0 / bloque);
+      const hasta = Math.ceil((ancho - x0) / bloque);
+      const rect = (columna, fila) => {
+        const x = Math.round((x0 + columna * texel) * dpr);
+        const y = Math.round(fila * texel * dpr);
+        return {
           x,
           y,
-          w: Math.round((xi + 1) * lado) - x,
-          h: Math.round((yi + 1) * lado) - y,
-        });
-      }
-      /* Cambiar el tamaño borra `rajas`: se repinta la fase en que iba. */
+          w: Math.round((x0 + (columna + 1) * texel) * dpr) - x,
+          h: Math.round((fila + 1) * texel * dpr) - y,
+        };
+      };
+      const enLienzo = (lista) => {
+        const salida = [];
+        for (let b = desde; b < hasta; b++) {
+          for (const [x, y] of lista) salida.push(rect(b * LADO + x, y));
+        }
+        return salida;
+      };
+      this.grietas = PATRON_POR_FASE.map(({ rajas, luces }) => ({
+        rajas: enLienzo(rajas),
+        luces: enLienzo(luces),
+      }));
+      /* Cambiar el tamaño borra los lienzos: se repinta la fase en que iba. */
       this.pintarRajas(this.fase);
     }
     this.dibujar();
   }
 
-  /** Pinta en `rajas` las grietas de las fases 0…`fase`; con −1 lo deja limpio. */
+  /** Pinta las grietas de las fases 0…`fase`; con −1 deja los lienzos limpios. */
   pintarRajas(fase) {
     this.fase = fase;
-    const ctx = this.rajas.getContext('2d');
-    ctx.clearRect(0, 0, this.rajas.width, this.rajas.height);
-    /* Primero la luz, un téxel más abajo; luego las rajas encima, para que
-       la luz solo asome por debajo de cada una. */
-    ctx.fillStyle = LUZ;
+    const oscuras = this.oscuras.getContext('2d');
+    const claras = this.claras.getContext('2d');
+    oscuras.clearRect(0, 0, this.oscuras.width, this.oscuras.height);
+    claras.clearRect(0, 0, this.claras.width, this.claras.height);
+    oscuras.fillStyle = OSCURA;
+    claras.fillStyle = CLARA;
     for (let f = 0; f <= fase; f++) {
-      for (const r of this.grietas[f]) ctx.fillRect(r.x, r.y + r.h, r.w, r.h);
-    }
-    ctx.fillStyle = NUCLEO;
-    for (let f = 0; f <= fase; f++) {
-      for (const r of this.grietas[f]) ctx.fillRect(r.x, r.y, r.w, r.h);
+      for (const r of this.grietas[f].rajas) oscuras.fillRect(r.x, r.y, r.w, r.h);
+      for (const r of this.grietas[f].luces) claras.fillRect(r.x, r.y, r.w, r.h);
     }
   }
+
 
   /**
    * Al entrar el puntero: se empieza a picar. Si el bloque se estaba
@@ -330,7 +326,13 @@ export default class CapaDeGrietas {
 
     if (this.estado === ENTERA || this.estado === AGRIETANDO) {
       ctx.drawImage(portada, 0, 0);
-      if (this.fase >= 0) ctx.drawImage(this.rajas, 0, 0);
+      if (this.fase >= 0) {
+        ctx.globalCompositeOperation = 'multiply';
+        ctx.drawImage(this.oscuras, 0, 0);
+        ctx.globalCompositeOperation = 'screen';
+        ctx.drawImage(this.claras, 0, 0);
+        ctx.globalCompositeOperation = 'source-over';
+      }
     } else if (this.estado === COLOCANDO) {
       const k = Math.min(1, this.t / COLOCAR);
       const s = ESCALA_COLOCAR + (1 - ESCALA_COLOCAR) * rebote(k);

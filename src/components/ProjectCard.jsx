@@ -102,7 +102,7 @@ export default function ProjectCard({ project, index }) {
   useLayoutEffect(() => {
     const canvas = lienzo.current;
     const nueva = crearPortada(canvas, (ctx, medidas) =>
-      pintarPortada(ctx, medidas, project, index), index + 1
+      pintarPortada(ctx, medidas, project, index)
     );
     capa.current = nueva;
 

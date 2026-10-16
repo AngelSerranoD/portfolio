@@ -13,7 +13,7 @@ const capas = new Map();
 
 self.onmessage = ({ data: m }) => {
   if (m.tipo === 'crear') {
-    capas.set(m.id, new CapaDeGrietas(m.canvas, { reducido: m.reducido, semilla: m.semilla }));
+    capas.set(m.id, new CapaDeGrietas(m.canvas, { reducido: m.reducido }));
     return;
   }
 
