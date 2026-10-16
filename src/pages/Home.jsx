@@ -6,6 +6,7 @@ import { useEffect, useState } from 'react';
 import Nav from '../components/Nav';
 import Footer from '../components/Footer';
 import ProjectCard from '../components/ProjectCard';
+import ChatContacto, { enfocarChat } from '../components/ChatContacto';
 import { projects } from '../data/projects';
 import {
   AUTHOR,
@@ -18,7 +19,6 @@ import {
   LANGUAGES,
   LINKEDIN,
   CV_FILE,
-  EMAIL,
   GITHUB_USER,
   SPLASHES,
 } from '../data/profile';
@@ -51,9 +51,9 @@ function TimelineRow({ title, subtitle, period, detail }) {
 }
 
 /** Panel con etiqueta a la izquierda y contenido a la derecha. */
-function Section({ label, children }) {
+function Section({ id, label, children }) {
   return (
-    <section className="mc-panel mt-6 grid gap-x-16 gap-y-6 sm:grid-cols-[160px_1fr]">
+    <section id={id} className="mc-panel mt-6 grid scroll-mt-20 gap-x-16 gap-y-6 sm:grid-cols-[160px_1fr]">
       <h2 className="label pt-1">{label}</h2>
       <div className="max-w-2xl">{children}</div>
     </section>
@@ -113,7 +113,7 @@ export default function Home() {
             <a href={`https://github.com/${GITHUB_USER}`} target="_blank" rel="noreferrer noopener" className="mc-boton">
               GitHub
             </a>
-            <a href={`mailto:${EMAIL}`} className="mc-boton">
+            <a href="#contacto" onClick={enfocarChat} className="mc-boton">
               Escríbeme
             </a>
           </div>
@@ -165,14 +165,14 @@ export default function Home() {
           </ul>
         </Section>
 
-        <Section label="Contacto">
+        <Section id="contacto" label="Contacto">
           <p className="text-[15px] leading-relaxed text-mc-texto">
             {LOCATION}. Disponible para incorporarme a un equipo donde seguir construyendo producto.
           </p>
+          <div className="mt-6">
+            <ChatContacto />
+          </div>
           <div className="mt-6 flex flex-wrap gap-2">
-            <a href={`mailto:${EMAIL}`} className="mc-boton">
-              Escríbeme
-            </a>
             <a href={CV_FILE} download className="mc-boton">
               Descargar CV
             </a>

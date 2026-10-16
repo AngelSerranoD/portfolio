@@ -120,6 +120,47 @@
     border-color: #2a2a2a #8b8b8b #8b8b8b #2a2a2a;
     color: #fff;
   }
+
+  /* Chat del juego (src/components/ChatContacto.jsx). Cada color lleva su sombra:
+     el mismo tono a un cuarto de brillo, como en el juego. */
+  .mc-chat-registro {
+    @apply h-64 overflow-y-auto px-3 py-2 font-mc text-[14px] leading-[1.6] sm:h-72;
+    background: rgba(0, 0, 0, 0.5);
+    border: 2px solid #000;
+  }
+  .mc-chat-entrada {
+    @apply mt-2 flex items-center gap-2 py-1.5 pl-3 pr-1.5 font-mc text-[14px];
+    background: rgba(0, 0, 0, 0.6);
+    border: 2px solid #000;
+  }
+  .mc-chat-entrada:focus-within {
+    border-color: #a0a0a0;
+  }
+  .mc-chat-entrada input {
+    @apply min-w-0 flex-1 bg-transparent text-white outline-none placeholder:text-[#8a8a8a] disabled:cursor-default;
+    caret-color: #fff;
+    text-shadow: 2px 2px 0 #3f3f3f;
+  }
+  .mc-chat-blanco {
+    color: #fff;
+    text-shadow: 2px 2px 0 #3f3f3f;
+  }
+  .mc-chat-gris {
+    color: #aaa;
+    text-shadow: 2px 2px 0 #2a2a2a;
+  }
+  .mc-chat-amarillo {
+    color: #ff5;
+    text-shadow: 2px 2px 0 #3f3f15;
+  }
+  .mc-chat-rojo {
+    color: #f55;
+    text-shadow: 2px 2px 0 #3f1515;
+  }
+  .mc-chat-verde {
+    color: #5f5;
+    text-shadow: 2px 2px 0 #153f15;
+  }
 }
 
 /* Demo de Ché boluda: las mismas piezas que su src/index.css */
