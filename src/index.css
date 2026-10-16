@@ -113,3 +113,40 @@
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
+
+/* Panorama de fondo (src/components/mc/Panorama.jsx). */
+.mc-panorama {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+  /* Mientras llega la imagen: cielo arriba, hierba abajo. */
+  background: linear-gradient(#78a7ff, #c0d8ff 50%, #5d7a3a 50%);
+}
+.mc-panorama__tira {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  aspect-ratio: 7680 / 1024; /* dos vueltas de la imagen de 3840×1024 */
+  background: url('/panorama/panorama.webp') repeat-x left center / auto 100%;
+  animation: mc-giro 240s linear infinite;
+  will-change: transform;
+}
+.mc-panorama::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at center, transparent 40%, rgba(0, 0, 0, 0.45));
+}
+@keyframes mc-giro {
+  to {
+    transform: translateX(-50%);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .mc-panorama__tira {
+    animation: none;
+  }
+}

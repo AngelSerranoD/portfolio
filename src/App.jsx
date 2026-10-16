@@ -8,9 +8,11 @@ import ProjectDetail from './pages/ProjectDetail';
 import DemoPage from './pages/DemoPage';
 import PrivacidadSchematicLab from './pages/PrivacidadSchematicLab';
 import NotFound from './pages/NotFound';
+import Escenario from './components/mc/Escenario';
 
 export default function App() {
   return (
+    <Escenario>
     <Routes>
       <Route path="/" element={<Home />} />
       <Route path="/proyecto/:slug" element={<ProjectDetail />} />
@@ -22,5 +24,6 @@ export default function App() {
       <Route path="/privacidad/litematica3d" element={<Navigate to="/privacidad/schematic-lab" replace />} />
       <Route path="*" element={<NotFound />} />
     </Routes>
+    </Escenario>
   );
 }

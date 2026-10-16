@@ -1,0 +1,23 @@
+<!doctype html>
+<!-- Taller del panorama. Copyright (c) 2026 Ángel Serrano Domínguez. Todos los derechos reservados. -->
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Taller del panorama</title>
+    <style>
+      body { margin: 0; font: 14px system-ui; background: #222; color: #eee; }
+      header { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; padding: 12px; }
+      #tira { display: block; width: 100%; height: auto; background: #111; }
+    </style>
+  </head>
+  <body>
+    <header>
+      <label>Semilla <input id="semilla" type="number" value="7704" /></label>
+      <button id="hornear">Hornear</button>
+      <button id="guardar" disabled>Guardar en public/panorama</button>
+      <span id="estado"></span>
+    </header>
+    <canvas id="tira"></canvas>
+    <script type="module" src="./hornear.js"></script>
+  </body>
+</html>

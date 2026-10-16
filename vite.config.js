@@ -1,3 +1,5 @@
+import fs from 'node:fs';
+import path from 'node:path';
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import { SITE_URL } from './src/data/profile.js';
@@ -19,9 +21,38 @@ function urlDelSitio() {
   };
 }
 
+/**
+ * Solo en desarrollo: el taller de herramientas/panorama envía aquí la tira
+ * horneada y se guarda en public/panorama. Únicamente acepta ese nombre.
+ */
+function guardarPanorama() {
+  return {
+    name: 'guardar-panorama',
+    apply: 'serve',
+    configureServer(server) {
+      server.middlewares.use('/__panorama', (req, res) => {
+        const archivo = new URL(req.url, 'http://x').searchParams.get('archivo') ?? '';
+        if (req.method !== 'POST' || archivo !== 'panorama.webp') {
+          res.statusCode = 400;
+          res.end();
+          return;
+        }
+        const trozos = [];
+        req.on('data', (t) => trozos.push(t));
+        req.on('end', () => {
+          const dir = path.resolve('public/panorama');
+          fs.mkdirSync(dir, { recursive: true });
+          fs.writeFileSync(path.join(dir, archivo), Buffer.concat(trozos));
+          res.end('ok');
+        });
+      });
+    },
+  };
+}
+
 export default defineConfig({
   // sustitutosTauri: solo afecta a los archivos de src/demos/schematic-lab/.
-  plugins: [sustitutosTauri(), react(), urlDelSitio()],
+  plugins: [sustitutosTauri(), react(), urlDelSitio(), guardarPanorama()],
   build: {
     // Three.js (~750 kB minificado) va en su propio trozo y solo lo pide la
     // demo de Schematic Lab al abrir un schematic; no se puede partir más. Se
