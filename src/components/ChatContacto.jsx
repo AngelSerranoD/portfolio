@@ -32,7 +32,7 @@ export default function ChatContacto() {
   const [paso, setPaso] = useState('espera');
   const [texto, setTexto] = useState('');
   const datos = useRef({ nombre: '', email: '', mensaje: '' });
-  const inicio = useRef(0);
+  const token = useRef(''); // lo firma el servidor al saludar
   const empezado = useRef(false);
   const vivo = useRef(true);
   const caja = useRef(null);
@@ -46,7 +46,16 @@ export default function ChatContacto() {
   function empezar() {
     if (empezado.current) return;
     empezado.current = true;
-    inicio.current = Date.now();
+    fetch('/api/contacto', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ accion: 'inicio' }),
+    })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => {
+        token.current = d?.token ?? '';
+      })
+      .catch(() => {});
     decir([{ color: 'amarillo', t: `${YO} se ha unido a la partida` }]);
     tras(() => {
       susurra('¡Hola! ¿Cómo te llamas?');
@@ -81,7 +90,7 @@ export default function ChatContacto() {
       const respuesta = await fetch('/api/contacto', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...datos.current, ms: Date.now() - inicio.current }),
+        body: JSON.stringify({ ...datos.current, token: token.current }),
         signal: AbortSignal.timeout(10000),
       });
       if (!respuesta.ok) throw new Error(String(respuesta.status));

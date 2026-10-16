@@ -3,13 +3,44 @@
  * correo con Resend. Necesita RESEND_API_KEY en las variables del proyecto.
  * Copyright (c) 2026 Ángel Serrano Domínguez. Todos los derechos reservados.
  */
+import { createHmac, timingSafeEqual } from 'node:crypto';
 import { EMAIL } from '../src/data/profile.js';
 
-/* Solo se aceptan envíos desde la web, sus vistas previas y el servidor local. */
-const ORIGENES = /^(https:\/\/(www\.)?aserrano\.dev|https:\/\/portfolio-[a-z0-9-]+\.vercel\.app|http:\/\/localhost:\d+)$/;
+/* Solo se aceptan envíos desde la web; localhost solo fuera de producción. */
+const ORIGENES = /^https:\/\/(www\.)?aserrano\.dev$/;
+const ORIGEN_LOCAL = /^http:\/\/localhost:\d+$/;
+const origenValido = (origen) =>
+  ORIGENES.test(origen) || (process.env.VERCEL_ENV !== 'production' && ORIGEN_LOCAL.test(origen));
 const EMAIL_VALIDO = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
-/* Menos de esto entre el saludo y el envío no lo hace una persona. */
+/* El token de «inicio» lo firma el servidor: menos de MINIMO_MS desde que se pidió no lo hace una
+   persona, y pasada una hora caduca. */
 const MINIMO_MS = 4000;
+const MAXIMO_MS = 60 * 60 * 1000;
+const MAX_BYTES = 6000;
+/* Límite por IP, solo dentro de la instancia (el límite real va en el cortafuegos de Vercel). */
+const MAX_ENVIOS = 3;
+const VENTANA_MS = 10 * 60 * 1000;
+const envios = new Map();
+
+const firmar = (marca) => createHmac('sha256', process.env.RESEND_API_KEY ?? '').update(String(marca)).digest('hex');
+
+function tokenValido(token) {
+  if (typeof token !== 'string') return false;
+  const [marca, firma = ''] = token.split('.');
+  const esperada = firmar(marca);
+  if (firma.length !== esperada.length || !timingSafeEqual(Buffer.from(firma), Buffer.from(esperada))) return false;
+  const edad = Date.now() - Number(marca);
+  return edad >= MINIMO_MS && edad <= MAXIMO_MS;
+}
+
+function excedeLimite(ip) {
+  const ahora = Date.now();
+  const recientes = (envios.get(ip) ?? []).filter((t) => ahora - t < VENTANA_MS);
+  recientes.push(ahora);
+  envios.set(ip, recientes);
+  if (envios.size > 500) for (const [clave, lista] of envios) if (ahora - lista[lista.length - 1] > VENTANA_MS) envios.delete(clave);
+  return recientes.length > MAX_ENVIOS;
+}
 
 const responder = (estado, datos) => Response.json(datos, { status: estado });
 
@@ -21,7 +52,8 @@ function limpiar(valor, max) {
 }
 
 export async function POST(request) {
-  if (!ORIGENES.test(request.headers.get('origin') ?? '')) return responder(403, { error: 'origen' });
+  if (!origenValido(request.headers.get('origin') ?? '')) return responder(403, { error: 'origen' });
+  if (Number(request.headers.get('content-length') ?? 0) > MAX_BYTES) return responder(413, { error: 'tamano' });
 
   let cuerpo;
   try {
@@ -30,19 +62,29 @@ export async function POST(request) {
     return responder(400, { error: 'datos' });
   }
 
+  // El saludo del chat pide un token; sin RESEND_API_KEY no se puede firmar ni enviar.
+  if (cuerpo?.accion === 'inicio') {
+    if (!process.env.RESEND_API_KEY) return responder(500, { error: 'config' });
+    const marca = Date.now();
+    return responder(200, { token: `${marca}.${firmar(marca)}` });
+  }
+
   const nombre = limpiar(cuerpo?.nombre, 60);
   const email = limpiar(cuerpo?.email, 254);
   const mensaje = limpiar(cuerpo?.mensaje, 1000);
   if (!nombre || !mensaje || !EMAIL_VALIDO.test(email)) return responder(400, { error: 'datos' });
-
-  // Un robot: se le dice que sí y no se manda nada.
-  if (!(Number(cuerpo.ms) >= MINIMO_MS)) return responder(200, { ok: true });
 
   const clave = process.env.RESEND_API_KEY;
   if (!clave) {
     console.error('Falta RESEND_API_KEY');
     return responder(500, { error: 'config' });
   }
+
+  // Un robot (o un token falso o caducado): se le dice que sí y no se manda nada.
+  if (!tokenValido(cuerpo.token)) return responder(200, { ok: true });
+
+  const ip = request.headers.get('x-real-ip') ?? request.headers.get('x-forwarded-for')?.split(',')[0] ?? '';
+  if (excedeLimite(ip)) return responder(429, { error: 'limite' });
 
   const respuesta = await fetch('https://api.resend.com/emails', {
     method: 'POST',
