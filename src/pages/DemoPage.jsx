@@ -30,21 +30,21 @@ export default function DemoPage() {
   const Marco = escritorio ? WindowFrame : PhoneFrame;
 
   return (
-    <div className="flex min-h-screen flex-col bg-paper">
-      <header className="border-b border-stone">
+    <div className="flex min-h-screen flex-col">
+      <header className="border-b-2 border-black bg-black/70">
         <div className="container-page flex h-16 items-center justify-between gap-4">
-          <Link to={`/proyecto/${project.slug}`} className="link-quiet text-sm">
+          <Link to={`/proyecto/${project.slug}`} className="mc-boton mc-boton-peque">
             Volver a la ficha
           </Link>
 
-          <div className="flex items-baseline gap-3">
-            <span className="font-display text-sm font-bold text-ink">
+          <div className="hidden items-baseline gap-3 min-[480px]:flex">
+            <span className="font-mc text-sm font-bold text-mc-texto mc-sombra">
               {project.name}
             </span>
             <span className="label">Demo</span>
           </div>
 
-          <button onClick={() => setRunId((n) => n + 1)} className="link-quiet text-sm">
+          <button onClick={() => setRunId((n) => n + 1)} className="mc-boton mc-boton-peque">
             Reiniciar
           </button>
         </div>
@@ -68,13 +68,13 @@ export default function DemoPage() {
         </Marco>
 
         {project.demoNote && (
-          <p className="max-w-md text-center text-xs leading-relaxed text-clay">
+          <p className="mc-franja max-w-md px-4 py-3 text-center text-xs leading-relaxed text-mc-suave">
             {project.demoNote}
           </p>
         )}
       </main>
 
-      <footer className="pb-6 text-center text-[11px] text-clay">
+      <footer className="mc-franja py-3 text-center font-mc text-[12px] text-mc-suave">
         © {new Date().getFullYear()} {AUTHOR}
       </footer>
     </div>

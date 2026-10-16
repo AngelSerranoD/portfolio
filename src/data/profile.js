@@ -70,3 +70,13 @@ export const LANGUAGES = [
   { name: 'Español', level: 'Nativo' },
   { name: 'Inglés', level: 'Avanzado' },
 ];
+
+/** Frases amarillas de la pantalla de título: sale una al azar en cada visita. */
+export const SPLASHES = [
+  '¡Aplicaciones que llegan a producción!',
+  '¡Offline-first!',
+  '¡Sin telemetría!',
+  '¡Kotlin, Flutter y React!',
+  '¡211 pruebas en Schematic Lab!',
+  '¡Hecho de principio a fin!',
+];

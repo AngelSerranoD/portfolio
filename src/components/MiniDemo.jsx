@@ -53,7 +53,7 @@ export default function MiniDemo({ slug, escritorio = false }) {
     >
       {Demo && tam?.w > 0 && (
         <div
-          className="relative overflow-hidden bg-black"
+          className="relative overflow-hidden bg-black text-ink"
           style={{
             width: anchoNativo,
             height: tam.h / escala,

@@ -20,6 +20,9 @@ export default {
         slate: '#6E6A63',
         ink: '#3B3834',
 
+        /* Estética de menú voxel. `texto` y `suave` siempre sobre fondo negro al 70 % o más. */
+        mc: { texto: '#E0E0E0', suave: '#BDBDBD', hover: '#FFFFA0', splash: '#FFFF00' },
+
         /* Paleta propia de la demo de DailyWeigh (src/demos/dailyweigh). */
         crema: '#F4E1C1',
         miel: '#D9A05B',
@@ -58,6 +61,7 @@ export default {
         /* Ranade en toda la página, con la variable de Fontshare (100-700). */
         sans: ['Ranade', 'system-ui', '-apple-system', 'Segoe UI', 'sans-serif'],
         display: ['Ranade', 'system-ui', 'sans-serif'],
+        mc: ['Monocraft', 'ui-monospace', 'monospace'],
         /* Jib M3ak: el naskh es el que dibuja bien el tashkil de la darija. */
         arabe: ['"Noto Naskh Arabic"', '"Geeza Pro"', '"Times New Roman"', 'serif'],
       },
@@ -69,6 +73,7 @@ export default {
           '0%': { opacity: '0', transform: 'translateY(14px)' },
           '100%': { opacity: '1', transform: 'translateY(0)' },
         },
+        splash: { '0%, 100%': { transform: 'rotate(-20deg) scale(1)' }, '50%': { transform: 'rotate(-20deg) scale(1.08)' } },
         /* DailyWeigh */
         subir: { from: { transform: 'translateY(100%)' }, to: { transform: 'translateY(0)' } },
         fundido: { from: { opacity: '0' }, to: { opacity: '1' } },
@@ -89,6 +94,7 @@ export default {
       },
       animation: {
         'fade-up': 'fade-up 0.7s cubic-bezier(0.22,1,0.36,1) both',
+        splash: 'splash 1s ease-in-out infinite',
         subir: 'subir 280ms cubic-bezier(0.2, 0.9, 0.3, 1)',
         fundido: 'fundido 200ms ease-out',
         asomar: 'asomar 220ms ease-out',

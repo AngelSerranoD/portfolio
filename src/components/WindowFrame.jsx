@@ -34,7 +34,7 @@ export default function WindowFrame({ children, width = 1280, height = 800 }) {
         style={{ width: width * escala, height: height * escala }}
       >
         <div
-          className="relative overflow-hidden bg-black"
+          className="relative overflow-hidden bg-black text-ink"
           style={{
             width,
             height,

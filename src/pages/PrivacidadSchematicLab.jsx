@@ -114,38 +114,39 @@ export default function PrivacidadSchematicLab() {
       <Nav />
 
       <article className="container-page max-w-2xl pt-12" lang={idioma}>
-        <div className="flex gap-4 text-sm" role="group" aria-label="Idioma / Language">
+        <div className="flex gap-2" role="group" aria-label="Idioma / Language">
           {IDIOMAS.map(([id, nombre]) => (
             <button
               key={id}
               type="button"
               onClick={() => setIdioma(id)}
               aria-pressed={idioma === id}
-              className={idioma === id ? 'font-bold text-ink' : 'link-quiet'}
+              className="mc-boton mc-boton-peque aria-pressed:border-white aria-pressed:text-mc-hover"
             >
               {nombre}
             </button>
           ))}
         </div>
 
-        <h1 className="mt-10 font-display text-4xl font-bold tracking-tightest sm:text-5xl">
+        <div className="mc-panel mt-6">
+        <h1 className="font-mc text-[27px] font-bold leading-tight text-mc-texto mc-sombra sm:text-[36px]">
           {t.titulo}
         </h1>
         <p className="label mt-4">{t.fecha}</p>
-        <p className="mt-8 leading-relaxed text-slate">{t.intro}</p>
+        <p className="mt-8 leading-relaxed text-mc-suave">{t.intro}</p>
 
         {t.secciones.map((s) => (
           <section key={s.h} className="mt-10">
-            <h2 className="font-display text-xl font-bold tracking-tight">{s.h}</h2>
+            <h2 className="font-mc text-[18px] font-bold text-mc-texto mc-sombra">{s.h}</h2>
             {s.l && (
-              <ul className="mt-3 list-disc space-y-2 pl-5 leading-relaxed text-slate">
+              <ul className="mt-3 list-disc space-y-2 pl-5 leading-relaxed text-mc-suave">
                 {s.l.map((x) => (
                   <li key={x}>{x}</li>
                 ))}
               </ul>
             )}
             {s.p?.map((x) => (
-              <p key={x} className="mt-3 leading-relaxed text-slate">
+              <p key={x} className="mt-3 leading-relaxed text-mc-suave">
                 {x}
                 {s.correo && (
                   <>
@@ -161,9 +162,10 @@ export default function PrivacidadSchematicLab() {
           </section>
         ))}
 
-        <p className="mt-12 text-xs text-clay">{t.aviso}</p>
+        <p className="mt-12 text-xs text-mc-suave">{t.aviso}</p>
+        </div>
         <p className="mt-6">
-          <Link to="/proyecto/schematic-lab" className="link-quiet text-sm">
+          <Link to="/proyecto/schematic-lab" className="mc-boton mc-boton-peque">
             {t.volver}
           </Link>
         </p>

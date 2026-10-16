@@ -1,6 +1,21 @@
 @import '@fontsource/noto-naskh-arabic/arabic-400.css';
 @import '@fontsource/noto-naskh-arabic/arabic-600.css';
 
+@font-face {
+  font-family: 'Monocraft';
+  src: url('./assets/fuentes/monocraft-400.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Monocraft';
+  src: url('./assets/fuentes/monocraft-700.woff2') format('woff2');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -29,30 +44,81 @@
     @apply mx-auto w-full max-w-5xl px-6 sm:px-10;
   }
 
-  /* Etiqueta editorial: versalitas espaciadas, como los DETAILS de la referencia. */
+  /* Etiqueta: versalitas en la fuente pixel, con la sombra del juego. */
   .label {
-    @apply text-[11px] font-medium uppercase tracking-[0.18em] text-slate;
+    @apply font-mc text-[13px] uppercase text-mc-suave;
+    text-shadow: 2px 2px 0 #383838;
   }
 
-  /* Regla horizontal, la única división estructural del diseño. */
   .rule {
-    @apply border-t border-stone;
-  }
-
-  .btn-primary {
-    @apply inline-flex items-center justify-center rounded-full bg-ink px-7 py-3
-           text-sm font-medium text-paper transition-colors duration-300
-           hover:bg-slate;
-  }
-
-  .btn-ghost {
-    @apply inline-flex items-center justify-center rounded-full border border-clay
-           px-7 py-3 text-sm font-medium text-slate transition-colors duration-300
-           hover:border-ink hover:text-ink;
+    @apply border-t border-white/15;
   }
 
   .link-quiet {
-    @apply text-slate transition-colors duration-300 hover:text-ink;
+    @apply text-mc-suave transition-colors duration-150 hover:text-mc-hover;
+  }
+
+  /* --- Estética de menú voxel --- */
+  .mc-sombra {
+    text-shadow: 2px 2px 0 #383838;
+  }
+
+  /* Botón del menú: piedra gris con bisel; al pasar, borde blanco y texto amarillo. */
+  .mc-boton {
+    @apply inline-flex select-none items-center justify-center gap-2 font-mc text-[18px] leading-none text-mc-texto;
+    min-height: 40px;
+    padding: 0 16px;
+    background: #6f6f6f url('./assets/mc/boton.png') repeat;
+    background-size: 32px 32px;
+    image-rendering: pixelated;
+    border: 2px solid #000;
+    box-shadow: inset 2px 2px 0 rgba(255, 255, 255, 0.35), inset -2px -4px 0 rgba(0, 0, 0, 0.35);
+    text-shadow: 2px 2px 0 #383838;
+  }
+  .mc-boton:hover,
+  .mc-boton:focus-visible {
+    border-color: #fff;
+    color: #ffffa0;
+    outline: none;
+  }
+  .mc-boton:active {
+    box-shadow: inset 2px 4px 0 rgba(0, 0, 0, 0.35), inset -2px -2px 0 rgba(255, 255, 255, 0.2);
+  }
+  .mc-boton:disabled {
+    background: #2c2c2c;
+    color: #a0a0a0;
+    box-shadow: none;
+    cursor: default;
+  }
+  .mc-boton-ancho {
+    width: 100%;
+    max-width: 400px;
+  }
+  .mc-boton-peque {
+    min-height: 32px;
+    padding: 0 12px;
+    font-size: 14px;
+  }
+
+  /* Panel de lista del menú. Sin backdrop-filter: desenfocaría el panorama en cada fotograma. */
+  .mc-panel {
+    @apply p-6 sm:p-8;
+    background: rgba(0, 0, 0, 0.72);
+    border-top: 2px solid #000;
+    border-bottom: 2px solid rgba(255, 255, 255, 0.18);
+  }
+
+  /* Franja oscura para textos sueltos sobre el panorama. */
+  .mc-franja {
+    background: rgba(0, 0, 0, 0.7);
+  }
+
+  /* Casilla de inventario, en oscuro para que el texto blanco se lea (8,8:1). */
+  .mc-ranura {
+    background: #4a4a4a;
+    border: 2px solid;
+    border-color: #2a2a2a #8b8b8b #8b8b8b #2a2a2a;
+    color: #fff;
   }
 }
 

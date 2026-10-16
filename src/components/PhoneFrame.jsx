@@ -14,7 +14,7 @@ export default function PhoneFrame({ children }) {
 
         {/* Pantalla. Se encoge en viewports pequeños para no desbordarlos. */}
         <div
-          className="relative overflow-hidden rounded-[36px] bg-black"
+          className="relative overflow-hidden rounded-[36px] bg-black text-ink"
           style={{
             width: 'min(344px, calc(100vw - 76px))',
             height: 'clamp(460px, calc(100dvh - 210px), 720px)',

@@ -6,7 +6,7 @@
  * caen de derecha a izquierda, como una página que se pasa, y debajo queda la
  * demo real funcionando en miniatura, con un «Abrir demo» que aparece poco a
  * poco. Al salir, los píxeles vuelven a su sitio y la demo se desmonta.
- * Pinchar lleva a la demo; la ficha técnica tiene su propio enlace debajo.
+ * Pinchar lleva a la demo; la ficha técnica tiene su propio enlace en la franja de debajo.
  *
  * En pantallas táctiles no hay hover: la portada se queda entera y un toque
  * abre la demo directamente.
@@ -16,12 +16,12 @@ import { Link } from 'react-router-dom';
 import { crearPortada } from './portadaPixeles';
 import MiniDemo from './MiniDemo';
 
-/* Colores de tailwind.config.js, que el canvas no puede leer de las clases. */
-const INK = [59, 56, 52];
-const PAPER = [234, 230, 221];
-const STONE = '#C7C2B9';
-const CLAY = '#8F8C84';
-const FUENTE = 'Ranade, system-ui, sans-serif';
+/* Grises del menú voxel, que el canvas no puede leer de las clases. */
+const INK = [43, 43, 43];
+const PAPER = [224, 224, 224];
+const STONE = '#A0A0A0';
+const CLAY = '#707070';
+const FUENTE = 'Monocraft, ui-monospace, monospace';
 
 /** Tiempo que se deja montada la demo tras salir, lo que tardan en volver los píxeles. */
 const APAGADO_MS = 1500;
@@ -63,8 +63,8 @@ function pintarPortada(ctx, { dpr, ancho, alto }, project, index) {
 
   /* Número, arriba a la izquierda. */
   ctx.textBaseline = 'top';
-  ctx.font = `500 12px ${FUENTE}`;
-  espaciado(1.5);
+  ctx.font = `400 12px ${FUENTE}`;
+  espaciado(0);
   ctx.fillStyle = CLAY;
   ctx.fillText(String(index + 1).padStart(2, '0'), margen, margen);
 
@@ -75,9 +75,9 @@ function pintarPortada(ctx, { dpr, ancho, alto }, project, index) {
   ctx.fillText(project.platform, margen, alto - margen, ancho - margen * 2);
 
   /* Nombre, encima de la plataforma y de abajo arriba. */
-  const cuerpo = ancho > 480 ? 44 : 32;
+  const cuerpo = ancho > 480 ? 40 : 28;
   ctx.font = `700 ${cuerpo}px ${FUENTE}`;
-  espaciado(-0.04 * cuerpo);
+  espaciado(0);
   ctx.fillStyle = `rgb(${PAPER.join(',')})`;
   const lineas = partir(ctx, project.name, ancho - margen * 2);
   let base = alto - margen - 26;
@@ -111,11 +111,11 @@ export default function ProjectCard({ project, index }) {
     });
     ro.observe(canvas);
 
-    /* Ranade llega de Fontshare: si aún no estaba, se repinta al llegar. */
+    /* Monocraft puede llegar después del primer pintado: se repinta al llegar. */
     let viva = true;
     document.fonts
       ?.load(`700 32px ${FUENTE}`)
-      .then(() => document.fonts.load(`500 12px ${FUENTE}`))
+      .then(() => document.fonts.load(`400 12px ${FUENTE}`))
       .then(() => viva && nueva.repintar())
       .catch(() => {});
 
@@ -164,7 +164,7 @@ export default function ProjectCard({ project, index }) {
 
       {/* La demo va fuera del enlace: trae sus propios enlaces y botones, y
           un <a> no puede ir dentro de otro. El enlace la tapa entera. */}
-      <div className="relative h-[400px] overflow-hidden bg-stone ring-ink ring-offset-4 ring-offset-paper has-[:focus-visible]:ring-2">
+      <div className="relative h-[400px] overflow-hidden border-2 border-black bg-[#2B2B2B] ring-white transition-shadow duration-150 hover:ring-2 has-[:focus-visible]:ring-2">
         {encendida && <MiniDemo slug={project.slug} escritorio={escritorio} />}
 
         <Link
@@ -180,7 +180,7 @@ export default function ProjectCard({ project, index }) {
 
           {/* Aparece cuando la página ya va por la mitad; al salir, se va sin esperar. */}
           <span
-            className={`pointer-events-none absolute bottom-5 left-1/2 -translate-x-1/2 rounded-full bg-ink/90 px-5 py-2.5 text-xs font-medium text-paper shadow-[0_10px_30px_-10px_rgba(0,0,0,0.6)] transition-[opacity,transform,filter] ${
+            className={`mc-boton mc-boton-peque pointer-events-none absolute bottom-5 left-1/2 -translate-x-1/2 transition-[opacity,transform,filter] ${
               abierta
                 ? 'translate-y-0 opacity-100 blur-0 delay-700 duration-700 ease-out'
                 : 'translate-y-3 opacity-0 blur-[2px] delay-0 duration-300 ease-in'
@@ -191,9 +191,9 @@ export default function ProjectCard({ project, index }) {
         </Link>
       </div>
 
-      <div className="mt-4 flex items-baseline justify-between gap-6">
-        <p className="text-sm leading-relaxed text-slate">{project.tagline}</p>
-        <Link to={`/proyecto/${project.slug}`} className="link-quiet shrink-0 text-xs">
+      <div className="mc-franja flex items-baseline justify-between gap-6 border-x-2 border-b-2 border-black px-4 py-3">
+        <p className="text-sm leading-relaxed text-mc-suave">{project.tagline}</p>
+        <Link to={`/proyecto/${project.slug}`} className="link-quiet shrink-0 font-mc text-[12px] mc-sombra">
           Ficha técnica
         </Link>
       </div>
