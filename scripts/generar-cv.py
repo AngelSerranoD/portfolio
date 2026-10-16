@@ -1,6 +1,8 @@
 """
 Genera el CV de Ángel Serrano Domínguez en PDF, en UNA SOLA PÁGINA.
 
+Copyright (c) 2026 Ángel Serrano Domínguez. Todos los derechos reservados.
+
 Dos idiomas con la misma maqueta: español e inglés. El contenido de cada uno
 vive en TEXTOS, así que al tocar uno es fácil mantener el otro al día.
 

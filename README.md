@@ -5,8 +5,9 @@ descripción, características y **notas técnicas** sobre las decisiones de
 arquitectura, además de una **demo interactiva** que se ejecuta dentro de un
 marco de móvil.
 
-El diseño es deliberadamente monocromo y sin iconografía: solo tipografía,
-espacio y reglas horizontales.
+El diseño imita un menú de juego de bloques: panorama voxel propio girando de
+fondo, botones de piedra en CSS y tipografía Monocraft (OFL) con Ranade para
+los párrafos. Sin sonido y sin afiliación con Mojang ni Microsoft.
 
 🔗 **En producción:** [aserrano.dev](https://aserrano.dev)
 

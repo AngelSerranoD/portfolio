@@ -1,3 +1,8 @@
+/**
+ * Configuración de Vite del portfolio y plugins de desarrollo.
+ *
+ * Copyright (c) 2026 Ángel Serrano Domínguez. Todos los derechos reservados.
+ */
 import fs from 'node:fs';
 import path from 'node:path';
 import { defineConfig } from 'vite';

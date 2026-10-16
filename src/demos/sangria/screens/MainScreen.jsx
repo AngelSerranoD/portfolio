@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Sun, Moon, Settings } from 'lucide-react';
 import { format, addDays } from 'date-fns';
 import { CalendarView } from '../components/CalendarView';
