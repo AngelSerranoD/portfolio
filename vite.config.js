@@ -21,6 +21,8 @@ function urlDelSitio() {
   };
 }
 
+const MAX_PANORAMA = 5 * 1024 * 1024;
+
 /**
  * Solo en desarrollo: el taller de herramientas/panorama envía aquí la tira
  * horneada y se guarda en public/panorama. Únicamente acepta ese nombre.
@@ -32,17 +34,37 @@ function guardarPanorama() {
     configureServer(server) {
       server.middlewares.use('/__panorama', (req, res) => {
         const archivo = new URL(req.url, 'http://x').searchParams.get('archivo') ?? '';
-        if (req.method !== 'POST' || archivo !== 'panorama.webp') {
-          res.statusCode = 400;
+        const rechazar = (codigo) => {
+          res.statusCode = codigo;
           res.end();
-          return;
+        };
+        /* Una web ajena no puede escribir aquí: solo se acepta el mismo origen y image/webp. */
+        const origen = req.headers['sec-fetch-site'];
+        if (
+          req.method !== 'POST' ||
+          archivo !== 'panorama.webp' ||
+          (origen && origen !== 'same-origin') ||
+          req.headers['content-type'] !== 'image/webp'
+        ) {
+          return rechazar(400);
         }
         const trozos = [];
-        req.on('data', (t) => trozos.push(t));
+        let tamano = 0;
+        req.on('data', (t) => {
+          tamano += t.length;
+          if (tamano > MAX_PANORAMA) {
+            req.destroy();
+            return;
+          }
+          trozos.push(t);
+        });
         req.on('end', () => {
+          const datos = Buffer.concat(trozos);
+          const esWebp = datos.length > 12 && datos.toString('latin1', 0, 4) === 'RIFF' && datos.toString('latin1', 8, 12) === 'WEBP';
+          if (tamano > MAX_PANORAMA || !esWebp) return rechazar(400);
           const dir = path.resolve('public/panorama');
           fs.mkdirSync(dir, { recursive: true });
-          fs.writeFileSync(path.join(dir, archivo), Buffer.concat(trozos));
+          fs.writeFileSync(path.join(dir, archivo), datos);
           res.end('ok');
         });
       });

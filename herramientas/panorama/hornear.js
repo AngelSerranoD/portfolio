@@ -339,7 +339,11 @@ botonHornear.onclick = async () => {
 botonGuardar.onclick = () =>
   tira.toBlob(
     async (blob) => {
-      const r = await fetch('/__panorama?archivo=panorama.webp', { method: 'POST', body: blob });
+      const r = await fetch('/__panorama?archivo=panorama.webp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'image/webp' },
+        body: blob,
+      });
       estado.textContent = r.ok ? `Guardado: ${Math.round(blob.size / 1024)} kB` : `Error ${r.status}`;
     },
     'image/webp',
