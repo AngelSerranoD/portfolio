@@ -80,8 +80,8 @@ export async function POST(request) {
     return responder(500, { error: 'config' });
   }
 
-  // Un robot (o un token falso o caducado): se le dice que sí y no se manda nada.
-  if (!tokenValido(cuerpo.token)) return responder(200, { ok: true });
+  // Un robot, o una página vieja sin token: error visible (el chat ofrece «Reintentar» y el correo).
+  if (!tokenValido(cuerpo.token)) return responder(400, { error: 'token' });
 
   const ip = request.headers.get('x-real-ip') ?? request.headers.get('x-forwarded-for')?.split(',')[0] ?? '';
   if (excedeLimite(ip)) return responder(429, { error: 'limite' });
