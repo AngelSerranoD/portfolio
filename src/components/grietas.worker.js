@@ -1,19 +1,19 @@
 /**
- * Worker que anima las portadas de píxeles del grid de proyectos.
+ * Worker que anima las portadas agrietables del grid de proyectos.
  * Copyright (c) 2026 Ángel Serrano Domínguez. Todos los derechos reservados.
  *
  * Cada tarjeta le transfiere su canvas (OffscreenCanvas) y desde entonces
- * solo le manda órdenes: la portada ya pintada, «desmorónate» y «recomponte».
+ * solo le manda órdenes: la portada ya pintada, «rómpete» y «restáurate».
  * Aquí no llega nada del trabajo de la página (React, montar una demo), así
  * que la animación no se frena aunque el hilo principal esté ocupado.
  */
-import CapaDePixeles from './pixeles';
+import CapaDeGrietas from './grietas';
 
 const capas = new Map();
 
 self.onmessage = ({ data: m }) => {
   if (m.tipo === 'crear') {
-    capas.set(m.id, new CapaDePixeles(m.canvas, { reducido: m.reducido }));
+    capas.set(m.id, new CapaDeGrietas(m.canvas, { reducido: m.reducido, semilla: m.semilla }));
     return;
   }
 
@@ -24,11 +24,11 @@ self.onmessage = ({ data: m }) => {
     case 'portada':
       capa.preparar(m.ancho, m.alto, m.dpr, m.portada);
       break;
-    case 'desmoronar':
-      capa.desmoronar();
+    case 'romper':
+      capa.romper();
       break;
-    case 'recomponer':
-      capa.recomponer();
+    case 'restaurar':
+      capa.restaurar();
       break;
     case 'destruir':
       capa.destruir();

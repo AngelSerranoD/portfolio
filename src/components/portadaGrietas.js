@@ -1,13 +1,13 @@
 /**
- * Mando de una portada de píxeles desde la página.
+ * Mando de una portada agrietable desde la página.
  * Copyright (c) 2026 Ángel Serrano Domínguez. Todos los derechos reservados.
  *
  * La portada se pinta aquí, en el hilo principal, porque las fuentes de la
- * página (Ranade) solo están cargadas aquí; se convierte en ImageBitmap y se
+ * página (Monocraft) solo están cargadas aquí; se convierte en ImageBitmap y se
  * manda al worker, que es quien anima. Si el navegador no puede transferir
- * un canvas a un worker, la misma CapaDePixeles corre en la página.
+ * un canvas a un worker, la misma CapaDeGrietas corre en la página.
  */
-import CapaDePixeles from './pixeles';
+import CapaDeGrietas from './grietas';
 
 const conWorker =
   typeof Worker !== 'undefined' &&
@@ -20,7 +20,7 @@ let worker = null;
 let siguienteId = 1;
 
 function elWorker() {
-  worker ??= new Worker(new URL('./pixeles.worker.js', import.meta.url), { type: 'module' });
+  worker ??= new Worker(new URL('./grietas.worker.js', import.meta.url), { type: 'module' });
   return worker;
 }
 
@@ -35,8 +35,9 @@ const transferidos = new WeakMap(); // canvas → { id, adios }
  * @param {HTMLCanvasElement} canvas
  * @param {(ctx: CanvasRenderingContext2D, medidas: {ancho: number, alto: number, dpr: number}) => void} pintar
  *   Pinta la portada en px del dispositivo; `ctx` empieza sin transformar.
+ * @param {number} [semilla]  Elige el dibujo de las grietas.
  */
-export function crearPortada(canvas, pintar) {
+export function crearPortada(canvas, pintar, semilla = 1) {
   const reducido =
     window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false;
   const papel = document.createElement('canvas');
@@ -54,7 +55,7 @@ export function crearPortada(canvas, pintar) {
   };
 
   if (!conWorker) {
-    const capa = new CapaDePixeles(canvas, { reducido });
+    const capa = new CapaDeGrietas(canvas, { reducido, semilla });
     const repintar = () => {
       if (!medidas) return;
       pintarPapel();
@@ -66,8 +67,8 @@ export function crearPortada(canvas, pintar) {
         repintar();
       },
       repintar,
-      desmoronar: () => capa.desmoronar(),
-      recomponer: () => capa.recomponer(),
+      romper: () => capa.romper(),
+      restaurar: () => capa.restaurar(),
       destruir: () => capa.destruir(),
     };
   }
@@ -79,7 +80,7 @@ export function crearPortada(canvas, pintar) {
     registro = { id: siguienteId++, adios: 0 };
     transferidos.set(canvas, registro);
     const offscreen = canvas.transferControlToOffscreen();
-    elWorker().postMessage({ tipo: 'crear', id: registro.id, canvas: offscreen, reducido }, [offscreen]);
+    elWorker().postMessage({ tipo: 'crear', id: registro.id, canvas: offscreen, reducido, semilla }, [offscreen]);
   }
   const { id } = registro;
   const mandar = (tipo) => elWorker().postMessage({ tipo, id });
@@ -102,8 +103,8 @@ export function crearPortada(canvas, pintar) {
       repintar();
     },
     repintar,
-    desmoronar: () => mandar('desmoronar'),
-    recomponer: () => mandar('recomponer'),
+    romper: () => mandar('romper'),
+    restaurar: () => mandar('restaurar'),
     destruir() {
       vigente++;
       registro.adios = setTimeout(() => {

@@ -2,10 +2,11 @@
  * Tarjeta del grid de proyectos.
  * Copyright (c) 2026 Ángel Serrano Domínguez. Todos los derechos reservados.
  *
- * La portada es un mosaico de píxeles (pixeles.js). Al pasar el ratón se
- * caen de derecha a izquierda, como una página que se pasa, y debajo queda la
- * demo real funcionando en miniatura, con un «Abrir demo» que aparece poco a
- * poco. Al salir, los píxeles vuelven a su sitio y la demo se desmonta.
+ * La portada se pinta en un canvas (grietas.js). Al pasar el ratón se
+ * agrieta en diez fases, como un bloque de Minecraft al picarlo, y al
+ * romperse deja debajo la demo real funcionando en miniatura, con un
+ * «Abrir demo» que aparece en ese momento. Al salir, el bloque vuelve a su
+ * sitio y la demo se desmonta.
  * Pinchar lleva a la demo; la ficha técnica tiene su propio enlace en la franja de debajo.
  *
  * En pantallas táctiles no hay hover: la portada se queda entera y un toque
@@ -13,7 +14,7 @@
  */
 import { startTransition, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { crearPortada } from './portadaPixeles';
+import { crearPortada } from './portadaGrietas';
 import MiniDemo from './MiniDemo';
 
 /* Grises del menú voxel, que el canvas no puede leer de las clases. */
@@ -23,13 +24,13 @@ const STONE = '#A0A0A0';
 const CLAY = '#707070';
 const FUENTE = 'Monocraft, ui-monospace, monospace';
 
-/** Tiempo que se deja montada la demo tras salir, lo que tardan en volver los píxeles. */
-const APAGADO_MS = 1500;
+/** Tiempo que se deja montada la demo tras salir, lo que tarda el bloque en volver a colocarse, con margen. */
+const APAGADO_MS = 400;
 
 /**
  * Montar una demo es lo caro (es la app entera), así que solo se monta si el
  * puntero se queda este rato encima: al cruzar el grid de pasada, los
- * píxeles caen pero no se monta nada. Cada tarjeta desmonta la suya cuando
+ * las grietas empiezan pero no se monta nada. Cada tarjeta desmonta la suya cuando
  * acaba de cerrarse, sin depender de lo que hagan las demás.
  */
 const INTENCION_MS = 160;
@@ -52,7 +53,7 @@ function partir(ctx, texto, ancho) {
 }
 
 function pintarPortada(ctx, { dpr, ancho, alto }, project, index) {
-  /* Fondo liso: los píxeles solo se notan cuando empiezan a caer. */
+  /* Fondo liso: encima van las grietas. */
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
   ctx.fillStyle = `rgb(${INK.join(',')})`;
   ctx.fillRect(0, 0, ancho, alto);
@@ -101,7 +102,7 @@ export default function ProjectCard({ project, index }) {
   useLayoutEffect(() => {
     const canvas = lienzo.current;
     const nueva = crearPortada(canvas, (ctx, medidas) =>
-      pintarPortada(ctx, medidas, project, index)
+      pintarPortada(ctx, medidas, project, index), index + 1
     );
     capa.current = nueva;
 
@@ -138,9 +139,9 @@ export default function ProjectCard({ project, index }) {
     clearTimeout(apagado.current);
     clearTimeout(encendido.current);
     setAbierta(true);
-    capa.current?.desmoronar();
+    capa.current?.romper();
     encendido.current = setTimeout(() => {
-      /* En transición: React puede trocear el montaje y no frena los píxeles. */
+      /* En transición: React puede trocear el montaje y no frena las grietas. */
       startTransition(() => setEncendida(true));
     }, INTENCION_MS);
   };
@@ -148,7 +149,7 @@ export default function ProjectCard({ project, index }) {
   const salir = () => {
     clearTimeout(encendido.current);
     setAbierta(false);
-    capa.current?.recomponer();
+    capa.current?.restaurar();
     clearTimeout(apagado.current);
     apagado.current = setTimeout(() => setEncendida(false), APAGADO_MS);
   };
@@ -178,11 +179,11 @@ export default function ProjectCard({ project, index }) {
         >
           <canvas ref={lienzo} aria-hidden="true" className="absolute inset-0 h-full w-full" />
 
-          {/* Aparece cuando la página ya va por la mitad; al salir, se va sin esperar. */}
+          {/* Aparece cuando se rompe el bloque (ROTURA en grietas.js); al salir, se va sin esperar. */}
           <span
             className={`mc-boton mc-boton-peque pointer-events-none absolute bottom-5 left-1/2 -translate-x-1/2 transition-[opacity,transform,filter] ${
               abierta
-                ? 'translate-y-0 opacity-100 blur-0 delay-700 duration-700 ease-out'
+                ? 'translate-y-0 opacity-100 blur-0 delay-[900ms] duration-300 ease-out'
                 : 'translate-y-3 opacity-0 blur-[2px] delay-0 duration-300 ease-in'
             }`}
           >
