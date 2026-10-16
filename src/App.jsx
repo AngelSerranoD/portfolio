@@ -3,6 +3,7 @@
  * Copyright (c) 2026 Ángel Serrano Domínguez. Todos los derechos reservados.
  */
 import { Routes, Route, Navigate } from 'react-router-dom';
+import { Analytics } from '@vercel/analytics/react';
 import Home from './pages/Home';
 import ProjectDetail from './pages/ProjectDetail';
 import DemoPage from './pages/DemoPage';
@@ -24,6 +25,7 @@ export default function App() {
       <Route path="/privacidad/litematica3d" element={<Navigate to="/privacidad/schematic-lab" replace />} />
       <Route path="*" element={<NotFound />} />
     </Routes>
+    <Analytics />
     </Escenario>
   );
 }
